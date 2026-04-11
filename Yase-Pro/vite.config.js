@@ -13,16 +13,18 @@
 //   },
 // });
 
-import { defineConfig } from "vite";
+import { defineConfig } from 'vite'
 
 export default defineConfig({
-  root: "./",
-  base: "./",
   build: {
-    outDir: "dist",
-    emptyOutDir: true,
-  },
-  server: {
-    port: 5173,
-  },
-});
+    rollupOptions: {
+      input: {
+        main: './index.html',
+        dashboard: './Dashboard.html',
+        cadastro: './CadastroUsuario.html',
+        gestao: './GestaoOS.html',
+        // Adicione as outras páginas aqui seguindo o mesmo padrão
+      }
+    }
+  }
+})
