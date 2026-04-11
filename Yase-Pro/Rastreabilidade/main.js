@@ -11,14 +11,12 @@ let selectedLevel = 1;
 let editandoID = null;
 // Inicialização ao carregar a página
 window.onload = async () => {
+  console.log("🚀 Iniciando carregamento de Rastreabilidade...");
+  
   const urlParams = new URLSearchParams(window.location.search);
-  window.currentOS = urlParams.get("os") || sessionStorage.getItem("currentOS");
-
-  if (!window.currentOS) {
-    alert("Nenhuma Ordem de Serviço selecionada.");
-    window.location.href = "GestaoOS.html";
-    return;
-  }
+  window.currentOS = urlParams.get("os") || sessionStorage.getItem("currentOS") || "1";
+  
+  console.log("📋 OS Atual:", window.currentOS);
 
   // Atualiza os elementos visuais da OS
   const displayOS = document.getElementById("displayOS");
@@ -32,8 +30,8 @@ window.onload = async () => {
   const campoData = document.getElementById("data_selagem");
   if (campoData) campoData.value = hoje;
 
-  // --- CARREGAMENTO INICIAL COM DESTAQUE ---
-  // Usamos o await para garantir que os dados cheguem antes de tentar focar
+  // --- CARREGAMENTO INICIAL ---
+  console.log("📥 Carregando itens do Supabase...");
   await loadItens();
 
   // Pequeno intervalo para o navegador terminar de renderizar o HTML da tabela
@@ -47,18 +45,30 @@ window.onload = async () => {
 // Ajuste na função loadItens para garantir a ordem correta
 async function loadItens() {
   try {
+    console.log("🔍 Buscando itens para OS:", window.currentOS);
+    
     const { data, error } = await _supabase
       .from("itens_os")
       .select("*")
       .eq("os_number", window.currentOS)
-      .order("created_at", { ascending: true }); // 'true' para o último ser o de baixo
+      .order("created_at", { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+      console.error("❌ Erro Supabase:", error);
+      throw error;
+    }
 
-    // Se você usa 'renderItens' ou 'renderizarTabela', chame-a aqui
-    renderItens(data);
+    console.log("✅ Dados recebidos:", data?.length || 0, "itens");
+
+    // Chama renderItens com os dados
+    if (typeof renderItens === "function") {
+      renderItens(data);
+      console.log("✅ Tabela renderizada");
+    } else {
+      console.error("❌ renderItens não está definida!");
+    }
   } catch (error) {
-    console.error("Erro ao carregar itens:", error);
+    console.error("❌ Erro ao carregar itens:", error);
   }
 }
 
@@ -85,11 +95,18 @@ _supabase
     "postgres_changes",
     { event: "*", schema: "public", table: "itens_os" },
     (payload) => {
-      console.log("Mudança detectada!", payload);
-      carregarItens(); // Chama a função que reconstrói a tabela
+      console.log("🔔 Mudança detectada no Supabase!", payload);
+      // Chama loadItens ao invés de carregarItens
+      if (typeof window.carregarItens === "function") {
+        window.carregarItens();
+      } else {
+        loadItens();
+      }
     },
   )
   .subscribe();
+
+console.log("✅ Realtime listener ativado para tabela itens_os");
 
 document.addEventListener("DOMContentLoaded", () => {
   // Recupera o nome que guardamos no login
