@@ -12,10 +12,11 @@ let editandoID = null;
 // Inicialização ao carregar a página
 window.onload = async () => {
   console.log("🚀 Iniciando carregamento de Rastreabilidade...");
-  
+
   const urlParams = new URLSearchParams(window.location.search);
-  window.currentOS = urlParams.get("os") || sessionStorage.getItem("currentOS") || "1";
-  
+  window.currentOS =
+    urlParams.get("os") || sessionStorage.getItem("currentOS") || "1";
+
   console.log("📋 OS Atual:", window.currentOS);
 
   // Atualiza os elementos visuais da OS
@@ -46,7 +47,7 @@ window.onload = async () => {
 async function loadItens() {
   try {
     console.log("🔍 Buscando itens para OS:", window.currentOS);
-    
+
     const { data, error } = await _supabase
       .from("itens_os")
       .select("*")
