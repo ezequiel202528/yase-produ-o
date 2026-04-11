@@ -28,8 +28,7 @@ export default defineConfig({
         anexoOeP: './AnexoOeP.html',
         remessas: './Remessa.html',
         controleDeCargas: './ControleDeCargas.html',
-        vinculacao: './Vinculacao.html',
-        controledepecas: './controleDeP.html',
+        vinculacao: './Vinculacao.html',       
         estoque: './estoquePecas.html',
 
         // Adicione as outras páginas aqui seguindo o mesmo padrão
