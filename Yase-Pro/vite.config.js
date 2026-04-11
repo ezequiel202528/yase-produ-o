@@ -24,6 +24,14 @@ export default defineConfig({
         cadastro: './CadastroUsuario.html',
         gestao: './GestaoOS.html',
         rastreio: './Rastreio_Full.html',
+        configuracao: './configuracoes.html',
+        anexoOeP: './AnexoOeP.html',
+        remessas: './Remessa.html',
+        controleDeCargas: './ControleDeCargas.html',
+        vinculacao: './Vinculacao.html',
+        controledepecas: './controleDeP.html',
+        estoque: './estoquePecas.html',
+
         // Adicione as outras páginas aqui seguindo o mesmo padrão
       }
     }
