@@ -23,6 +23,7 @@ export default defineConfig({
         dashboard: './Dashboard.html',
         cadastro: './CadastroUsuario.html',
         gestao: './GestaoOS.html',
+        rastreio: './Rastreio_Full.html',
         // Adicione as outras páginas aqui seguindo o mesmo padrão
       }
     }
