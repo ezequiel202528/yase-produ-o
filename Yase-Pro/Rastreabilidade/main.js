@@ -7,7 +7,7 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const operadorAtual = localStorage.getItem("nome_operador") || "Sistema";
 
 window.currentOS = "";
-let selectedLevel = 1;
+window.selectedLevel = 1;
 let editandoID = null;
 // Inicialização ao carregar a página
 document.addEventListener("DOMContentLoaded", async () => {

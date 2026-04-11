@@ -253,7 +253,7 @@ function definirNivelPeloReteste() {
 }
 // Função setLevel atualizada com automação de Pintura e Badge
 function setLevel(lvl) {
-  selectedLevel = lvl; // Variável global
+  window.selectedLevel = lvl; // Variável global com window
 
   // Atualiza visual dos botões NV1, NV2, NV3
   document.querySelectorAll("[data-level]").forEach((btn) => {
