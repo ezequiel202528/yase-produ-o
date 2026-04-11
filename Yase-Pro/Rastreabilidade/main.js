@@ -33,7 +33,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (campoData) campoData.value = hoje;
 
   // Verifica se renderItens existe
-  console.log("✅ renderItens disponível:", typeof renderItens === "function" ? "SIM" : "NÃO");
+  console.log(
+    "✅ renderItens disponível:",
+    typeof renderItens === "function" ? "SIM" : "NÃO",
+  );
 
   // --- CARREGAMENTO INICIAL ---
   console.log("📥 Carregando itens do Supabase...");
@@ -51,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function loadItens() {
   try {
     console.log("🔍 Buscando itens para OS:", window.currentOS);
-    
+
     // Verifica se o elemento da tabela existe
     const tabelaElement = document.getElementById("itensList");
     console.log("✅ Tabela DOM encontrada:", tabelaElement ? "SIM" : "NÃO");
