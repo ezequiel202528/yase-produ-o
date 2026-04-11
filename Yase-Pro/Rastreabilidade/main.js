@@ -109,98 +109,30 @@
 const SUPABASE_URL = "https://gzojpxgpgjapsegerscb.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s";
 
-// Variável global de conexão
-window._supabase = null;
+// Cria a conexão global imediatamente como você fez na Gestão de OS
+window._supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Função de conexão com espera (Timeout)
-function conectarAoBanco() {
-  if (window.supabase) {
-    window._supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("YaSe PRO: Banco conectado!");
-    if (window.currentOS) loadItens();
-  } else {
-    setTimeout(conectarAoBanco, 100);
-  }
-}
-
-conectarAoBanco();
-
-// Variáveis Globais
 window.currentOS = "";
-let selectedLevel = 1;
-let editandoID = null;
 
-// Inicialização da Página
 window.onload = async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  window.currentOS = urlParams.get("os") || sessionStorage.getItem("currentOS");
+    const urlParams = new URLSearchParams(window.location.search);
+    window.currentOS = urlParams.get("os") || sessionStorage.getItem("currentOS");
 
-  if (!window.currentOS) {
-    alert("Nenhuma Ordem de Serviço selecionada.");
-    window.location.href = "GestaoOS.html";
-    return;
-  }
-
-  const displayOS = document.getElementById("displayOS");
-  if (displayOS) displayOS.innerText = window.currentOS;
-
-  const campoData = document.getElementById("data_selagem");
-  if (campoData) campoData.value = new Date().toISOString().split("T")[0];
-
-  setTimeout(() => {
-    if (window._supabase) loadItens();
-  }, 500);
-};
-
-// FUNÇÃO PRINCIPAL (Nome padronizado como loadItens)
-async function loadItens() {
-  if (!window._supabase) return;
-  try {
-    const { data, error } = await window._supabase
-      .from("itens_os")
-      .select("*")
-      .eq("os_number", window.currentOS)
-      .order("created_at", { ascending: true });
-
-    if (error) throw error;
-    if (typeof renderItens === "function") renderItens(data);
-  } catch (error) {
-    console.error("Erro ao carregar itens:", error);
-  }
-}
-
-// ALIAS: Criamos este apelido para que, se algum outro arquivo chamar 'carregarItens', não dê erro
-window.carregarItens = loadItens;
-
-// Realtime corrigido para usar o nome certo da função
-function ativarRealtime() {
-    if (!window._supabase) {
-        setTimeout(ativarRealtime, 500);
+    if (!window.currentOS) {
+        alert("Nenhuma Ordem de Serviço selecionada.");
+        window.location.href = "GestaoOS.html";
         return;
     }
-    window._supabase
-      .channel("custom-all-channel")
-      .on("postgres_changes", { event: "*", schema: "public", table: "itens_os" }, (payload) => {
-          console.log("Mudança detectada!", payload);
-          loadItens(); // Usando o nome correto aqui
-      })
-      .subscribe();
-}
-ativarRealtime();
 
-// Eventos de Interface
-document.addEventListener("DOMContentLoaded", () => {
-  const campoCarga = document.getElementById("tipo_carga");
-  if (campoCarga) {
-    campoCarga.addEventListener("change", function () {
-      const valor = this.value || "ABC";
-      const titulo = document.getElementById("titulo_pesagem");
-      if (titulo) titulo.innerText = "Pesagem " + valor;
-    });
-  }
-});
+    document.getElementById("displayOS").innerText = window.currentOS;
+    
+    // Chama a função de carregar itens (que deve estar no api-service ou aqui)
+    if (typeof loadItens === "function") {
+        await loadItens();
+    }
+};
 
-function logout() {
-  sessionStorage.clear();
-  window.location.href = "EntrarSistema.html";
-}
+// Garante que o nome 'carregarItens' funcione se for chamado
+window.carregarItens = async function() {
+    await loadItens();
+};
