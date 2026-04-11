@@ -2,27 +2,21 @@
   "name": "yasse",
   "version": "1.0.0",
   "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "dist": "electron-builder",
-    "clean": "rm -rf dist",
-    "build": "npm run clean && electron-builder",
-    "dev:vite": "vite",
-    "build:vite": "vite build",
-    "preview:vite": "vite preview"
-  },
-
+ "scripts": {
+  "start": "vite",
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-     "electron": "^v36.4.0",
-    "electron-builder": "^24.17.0",
-    "vite": "^5.2.0",
     "@babel/core": "^7.26.7",
-    "@babel/preset-env": "^7.26.7"
+    "@babel/preset-env": "^7.26.7",
+    "electron": "^v36.4.0",
+    "vite": "^5.2.0"
   },
-
   "dependencies": {
     "babel-plugin-polyfill-regenerator": "^0.6.3",
     "batch": "^0.6.1",
@@ -267,7 +261,6 @@
     "vary": "^1.1.2",
     "watchpack": "^2.4.2",
     "wbuf": "^1.7.3",
-    
     "websocket-driver": "^0.7.4",
     "websocket-extensions": "^0.1.4",
     "which": "^2.0.2",
