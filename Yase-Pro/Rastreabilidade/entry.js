@@ -1,0 +1,14 @@
+import "./api-service.js";
+import "./calculos-tecnicos.js";
+import "./funcaoUniversalDeConfirmacao.js";
+import "./renderizarTabela.js";
+import "./ui-updates.js";
+import "./atualizarSelo.js";
+import "./trocarUsuario.js";
+import "./fabricante.js";
+import "./EditarExcluir.js";
+import "./relatorioHidro.js";
+import "./etiquetas.js";
+import "./buscarCilindro.js";
+import "./inutilizar.js";
+import "./main.js";

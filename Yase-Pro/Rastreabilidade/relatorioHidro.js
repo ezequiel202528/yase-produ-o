@@ -9,8 +9,8 @@ async function gerarRelatorioSaida() {
     return;
   }
 
-  const janelaImpressao = window.open('', '', 'width=1400,height=900');
-  
+  const janelaImpressao = window.open("", "", "width=1400,height=900");
+
   const html = `
     <!DOCTYPE html>
     <html lang="pt-br">
@@ -45,7 +45,7 @@ async function gerarRelatorioSaida() {
         <div class="text-right">
           <div class="text-[10px] font-bold text-slate-400 uppercase">Ordem de Serviço</div>
           <div class="text-2xl font-black text-slate-900">#${currentOS}</div>
-          <div class="text-[8px] text-slate-500 font-medium">${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</div>
+          <div class="text-[8px] text-slate-500 font-medium">${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}</div>
         </div>
       </div>
 
@@ -82,45 +82,49 @@ async function gerarRelatorioSaida() {
           </tr>
         </thead>
         <tbody>
-          ${itens.map(item => {
-            const volume = parseFloat(item.vol_litros) || 0;
-            const pVazio = parseFloat(item.p_cil_vazio_kg) || 0;
-            const tara = parseFloat(item.tara_cilindro) || 0;
-            const perdaMassa = (tara > 0) ? (((tara - pVazio) / tara) * 100).toFixed(2) : "0.00";
-            const capMax = (volume > 0) ? (volume * 0.68).toFixed(2) : "-";
+          ${itens
+            .map((item) => {
+              const volume = parseFloat(item.vol_litros) || 0;
+              const pVazio = parseFloat(item.p_cil_vazio_kg) || 0;
+              const tara = parseFloat(item.tara_cilindro) || 0;
+              const perdaMassa =
+                tara > 0 ? (((tara - pVazio) / tara) * 100).toFixed(2) : "0.00";
+              const capMax = volume > 0 ? (volume * 0.68).toFixed(2) : "-";
 
-            return `
+              return `
             <tr>
               <td class="mono text-slate-400">${item.os_number || currentOS}</td>
-              <td class="font-medium">${item.data_abertura || '-'}</td>
-              <td class="text-left font-bold text-slate-700 truncate">${item.razao_social || 'CLIENTE NÃO IDENTIFICADO'}</td>
-              <td class="font-black text-slate-900 bg-slate-50/50">${item.nr_cilindro || '-'}</td>
-              <td>${item.tipo_carga || '-'}</td>
-              <td>${item.capacidade || '-'}</td>
+              <td class="font-medium">${item.data_abertura || "-"}</td>
+              <td class="text-left font-bold text-slate-700 truncate">${item.razao_social || "CLIENTE NÃO IDENTIFICADO"}</td>
+              <td class="font-black text-slate-900 bg-slate-50/50">${item.nr_cilindro || "-"}</td>
+              <td>${item.tipo_carga || "-"}</td>
+              <td>${item.capacidade || "-"}</td>
               <td class="font-bold">3</td>
-              <td class="mono text-blue-600">${item.num_selo || '-'}</td>
-              <td>${item.ult_reteste || '-'}</td>
-              <td class="highlight-red">${item.prox_reteste || '-'}</td>
+              <td class="mono text-blue-600">${item.num_selo || "-"}</td>
+              <td>${item.ult_reteste || "-"}</td>
+              <td class="highlight-red">${item.prox_reteste || "-"}</td>
               <td><span class="badge-apr">APR</span></td>
-              <td class="mono">${item.tara_cilindro || '-'}</td>
-              <td class="mono">${item.p_cil_vazio_kg || '-'}</td>
-              <td class="mono">${item.peso_cheio || '-'}</td>
-              <td class="mono ${parseFloat(perdaMassa) > 10 ? 'highlight-red' : ''}">${perdaMassa}%</td>
+              <td class="mono">${item.tara_cilindro || "-"}</td>
+              <td class="mono">${item.p_cil_vazio_kg || "-"}</td>
+              <td class="mono">${item.peso_cheio || "-"}</td>
+              <td class="mono ${parseFloat(perdaMassa) > 10 ? "highlight-red" : ""}">${perdaMassa}%</td>
               <td class="mono font-bold">${capMax}</td>
-              <td class="mono">${item.vol_litros || '-'}</td>
-              <td class="font-bold text-slate-400">${item.p_trabalho_pnc || '1.0'}</td>
-              <td class="font-bold text-rose-600">${item.ep_ensaio || '-'}</td>
-              <td class="mono">${item.et_ensaio || '-'}</td>
-              <td class="font-black text-blue-600">${item.ep_porcent_final || '-'}%</td>
+              <td class="mono">${item.vol_litros || "-"}</td>
+              <td class="font-bold text-slate-400">${item.p_trabalho_pnc || "1.0"}</td>
+              <td class="font-bold text-rose-600">${item.ep_ensaio || "-"}</td>
+              <td class="mono">${item.et_ensaio || "-"}</td>
+              <td class="font-black text-blue-600">${item.ep_porcent_final || "-"}%</td>
             </tr>
-          `}).join('')}
+          `;
+            })
+            .join("")}
         </tbody>
       </table>
 
       <div class="mt-12 flex justify-between items-center px-10">
         <div class="text-center">
           <div class="w-48 border-b border-slate-300 mb-2"></div>
-          <p class="text-[8px] font-black uppercase text-slate-900">${document.getElementById("userName")?.innerText || 'RESPONSÁVEL TÉCNICO'}</p>
+          <p class="text-[8px] font-black uppercase text-slate-900">${document.getElementById("userName")?.innerText || "RESPONSÁVEL TÉCNICO"}</p>
           <p class="text-[6px] font-bold text-slate-400 tracking-widest uppercase">Assinatura Digitalizada</p>
         </div>
         <div class="flex flex-col items-center opacity-30">
@@ -140,3 +144,5 @@ async function gerarRelatorioSaida() {
   janelaImpressao.document.write(html);
   janelaImpressao.document.close();
 }
+
+window.gerarRelatorioSaida = gerarRelatorioSaida;

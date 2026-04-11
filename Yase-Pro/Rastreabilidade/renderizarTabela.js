@@ -53,16 +53,14 @@ async function carregarItens() {
     if (contadorEl) contadorEl.innerText = data ? data.length : 0;
 
     renderItens(data);
-    
+
     // --- NOVIDADE: Após renderizar, seleciona a última e ativa cliques ---
     configurarCliquesTabela();
-    destacarUltimaLinha(); 
-    
+    destacarUltimaLinha();
   } catch (err) {
     console.error("Erro ao carregar tabela:", err);
   }
 }
-
 
 // Auxiliar para formatar datas na visualização
 function fixData(v) {
@@ -77,37 +75,36 @@ function fixData(v) {
 
 // Função para rolar até o último item registrado
 const focarUltimoRegistro = () => {
-    const tabelaBody = document.getElementById('itensList');
-    if (!tabelaBody) return;
+  const tabelaBody = document.getElementById("itensList");
+  if (!tabelaBody) return;
 
-    const linhas = tabelaBody.querySelectorAll('tr');
-    
-    if (linhas.length > 0) {
-        const ultimaLinha = linhas[linhas.length - 1];
-        
-        // Scroll suave até o final da lista
-        ultimaLinha.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const linhas = tabelaBody.querySelectorAll("tr");
 
-        // Limpa destaques de carregamentos anteriores
-        tabelaBody.querySelectorAll('td').forEach(td => {
-            td.classList.remove('bg-blue-600/20', 'border-y', 'border-blue-500/50');
-        });
+  if (linhas.length > 0) {
+    const ultimaLinha = linhas[linhas.length - 1];
 
-        // Aplica o azul suave em todas as células (incluindo o ID fixo)
-        ultimaLinha.querySelectorAll('td').forEach(td => {
-            td.classList.add('bg-blue-600/20', 'border-y', 'border-blue-500/50');
-        });
+    // Scroll suave até o final da lista
+    ultimaLinha.scrollIntoView({ behavior: "smooth", block: "center" });
 
-        // Adiciona a borda lateral azul no ID para destaque visual
-        ultimaLinha.classList.add('border-l-4', 'border-blue-500');
-    }
+    // Limpa destaques de carregamentos anteriores
+    tabelaBody.querySelectorAll("td").forEach((td) => {
+      td.classList.remove("bg-blue-600/20", "border-y", "border-blue-500/50");
+    });
+
+    // Aplica o azul suave em todas as células (incluindo o ID fixo)
+    ultimaLinha.querySelectorAll("td").forEach((td) => {
+      td.classList.add("bg-blue-600/20", "border-y", "border-blue-500/50");
+    });
+
+    // Adiciona a borda lateral azul no ID para destaque visual
+    ultimaLinha.classList.add("border-l-4", "border-blue-500");
+  }
 };
 
 // 2. RENDERIZAÇÃO DA TABELA (ORDEM SOLICITADA)
 
 // function renderItens(itens) {
-  
-  
+
 //   const list = document.getElementById("itensList");
 //   if (!list) return;
 
@@ -221,7 +218,7 @@ const focarUltimoRegistro = () => {
 //                 <div class="flex gap-2 justify-end">
 //                   <button onclick="prepararEdicao('${item.id}')" class="text-amber-500 hover:text-amber-400"><i class="fa-solid fa-pen-to-square"></i></button>
 //                   <button onclick="deletarItem('${item.id}')" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
-                
+
 // <button onclick="abrirModalInutilizar('${item.id}')" class="text-gray-400 hover:text-gray-300">
 //     <i class="fa-solid fa-ban text-[10px]"></i>
 // </button>
@@ -261,7 +258,7 @@ const focarUltimoRegistro = () => {
 //     .map((item, index) => {
 //       // 1. Pegamos o status (usando fallback para o que estiver no banco)
 //       const s = (item.status || item.status_servico || "APROVADO").toUpperCase();
-      
+
 //       // 2. Definimos a cor da linha toda (se for Inutilizado, fica vermelho)
 //       const corDaLinha = s === "INUTILIZADO" ? "text-red-500 font-bold" : "text-slate-300";
 
@@ -367,7 +364,8 @@ function renderItens(itens) {
   }
 
   const formatarDataLocal = (dataStr) => {
-    if (!dataStr || dataStr === "" || dataStr === "-" || dataStr === "null") return "-";
+    if (!dataStr || dataStr === "" || dataStr === "-" || dataStr === "null")
+      return "-";
     if (dataStr.length === 10) {
       const [ano, mes, dia] = dataStr.split("-");
       return `${dia}/${mes}/${ano}`;
@@ -386,10 +384,16 @@ function renderItens(itens) {
   list.innerHTML = itens
     .map((item, index) => {
       // 1. Definição de Status e Cores
-      const s = (item.status || item.status_servico || "APROVADO").toUpperCase();
-      const corDaLinha = s === "INUTILIZADO" ? "text-red-500 font-bold" : "text-slate-300";
+      const s = (
+        item.status ||
+        item.status_servico ||
+        "APROVADO"
+      ).toUpperCase();
+      const corDaLinha =
+        s === "INUTILIZADO" ? "text-red-500 font-bold" : "text-slate-300";
 
-      let classesStatus = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+      let classesStatus =
+        "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
       if (s === "REPROVADO" || s === "REP" || s === "INUTILIZADO") {
         classesStatus = "bg-red-500/10 text-red-400 border-red-500/20";
       } else if (s === "NOVO") {
@@ -398,7 +402,9 @@ function renderItens(itens) {
 
       // --- AJUSTE AQUI: Variáveis dentro do MAP para ler cada item ---
       const dataLancamento = formatarDataLocal(item.created_at);
-      const dataAlteracao = item.updated_at ? formatarDataLocal(item.updated_at) : "Sem alterações";
+      const dataAlteracao = item.updated_at
+        ? formatarDataLocal(item.updated_at)
+        : "Sem alterações";
       const usuarioAlt = item.usuario_alteracao || "-";
 
       return `
@@ -481,7 +487,7 @@ function renderItens(itens) {
 
 // 3. LÓGICA DE DESTAQUE E NAVEGAÇÃO
 function destacarLinha(index) {
-  const rows = document.querySelectorAll('#itensList tr');
+  const rows = document.querySelectorAll("#itensList tr");
   if (rows.length === 0) return;
 
   // Limita o índice
@@ -489,24 +495,41 @@ function destacarLinha(index) {
   if (index >= rows.length) index = rows.length - 1;
 
   // Remove destaques de todas as linhas
-  rows.forEach(row => {
-    row.classList.remove('row-highlight-active', 'linha-recente', 'border-l-4', 'border-blue-500');
-    row.querySelectorAll('td').forEach(td => td.classList.remove('bg-blue-600/20', 'border-y', 'border-blue-500/50'));
+  rows.forEach((row) => {
+    row.classList.remove(
+      "row-highlight-active",
+      "linha-recente",
+      "border-l-4",
+      "border-blue-500",
+    );
+    row
+      .querySelectorAll("td")
+      .forEach((td) =>
+        td.classList.remove("bg-blue-600/20", "border-y", "border-blue-500/50"),
+      );
   });
 
   // Aplica novo destaque
   const activeRow = rows[index];
-  activeRow.classList.add('row-highlight-active', 'border-l-4', 'border-blue-500');
-  activeRow.querySelectorAll('td').forEach(td => td.classList.add('bg-blue-600/20', 'border-y', 'border-blue-500/50'));
-  
+  activeRow.classList.add(
+    "row-highlight-active",
+    "border-l-4",
+    "border-blue-500",
+  );
+  activeRow
+    .querySelectorAll("td")
+    .forEach((td) =>
+      td.classList.add("bg-blue-600/20", "border-y", "border-blue-500/50"),
+    );
+
   selectedRowIndex = index;
-  activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  activeRow.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 function configurarCliquesTabela() {
-  const tableBody = document.getElementById('itensList');
+  const tableBody = document.getElementById("itensList");
   tableBody.onclick = (e) => {
-    const row = e.target.closest('tr');
+    const row = e.target.closest("tr");
     if (row && row.dataset.index !== undefined) {
       destacarLinha(parseInt(row.dataset.index));
     }
@@ -514,27 +537,25 @@ function configurarCliquesTabela() {
 }
 
 function destacarUltimaLinha() {
-  const rows = document.querySelectorAll('#itensList tr');
+  const rows = document.querySelectorAll("#itensList tr");
   if (rows.length > 0) {
     destacarLinha(rows.length - 1);
   }
 }
 
 // 4. EVENTOS DE TECLADO (SETAS)
-document.addEventListener('keydown', (e) => {
+document.addEventListener("keydown", (e) => {
   // Evita mover se estiver digitando em campos
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
 
-  if (e.key === 'ArrowDown') {
+  if (e.key === "ArrowDown") {
     e.preventDefault();
     destacarLinha(selectedRowIndex + 1);
-  } else if (e.key === 'ArrowUp') {
+  } else if (e.key === "ArrowUp") {
     e.preventDefault();
     destacarLinha(selectedRowIndex - 1);
   }
 });
-
-
 
 // async function registrarItem() {
 //   // 1. RECUPERAÇÃO DE CONTEXTO
@@ -552,8 +573,8 @@ document.addEventListener('keydown', (e) => {
 //   try {
 //     // 2. BUSCA O SELO REAL NO BANCO (O GATILHO DO FLASH)
 //     // Chamamos uma vez só aqui no início do try
-//     const checagem = await sincronizarPainelSelos(); 
-    
+//     const checagem = await sincronizarPainelSelos();
+
 //     // Se a função retornar que não pode gravar (lote vazio), paramos aqui
 //     if (window.proximoSeloCalculado === undefined) {
 //        alert("⚠️ Erro ao calcular próximo selo ou lote esgotado.");
@@ -579,17 +600,15 @@ document.addEventListener('keydown', (e) => {
 //     // 3. MONTAGEM DO OBJETO DE DADOS
 //     const dados = {
 
-
 //       os_number: osAtiva,
 //       empresa_id: empresaIdLogada,
 //       usuario_lancamento: nomeOperadorLogado || "Técnico",
-      
+
 //       // ✅ SEQUÊNCIA CORRETA
 //       selo_inmetro: seloNumParaGravar,
 //       prefixo_selo: prefixoParaGravar,
 //       cod_barras: "21" + seloNumParaGravar.toString().padStart(6, "0"),
-      
-      
+
 //       nr_cilindro: limpar("nr_cilindro"),
 //       num_patrimonio: limpar("N-Patrimonio") || limpar("pallet"),
 //       fabricante_id: limpar("X_input_id", "num"),
@@ -600,8 +619,8 @@ document.addEventListener('keydown', (e) => {
 //       ult_reteste: limpar("ult_reteste", "num"),
 
 //       prox_reteste: textoReteste && textoReteste !== "----" ? parseInt(textoReteste) : null,
-//       prox_recarga: typeof converterDataBRparaISO === "function" 
-//         ? converterDataBRparaISO(textoRecarga) 
+//       prox_recarga: typeof converterDataBRparaISO === "function"
+//         ? converterDataBRparaISO(textoRecarga)
 //         : null,
 
 //       p_vazio_valvula: limpar("p_vazio_valvula", "num"),
@@ -640,11 +659,11 @@ document.addEventListener('keydown', (e) => {
 
 //     // 6. SUCESSO - O FLASH DE LUZ ESTÁ AQUI
 //     console.log("Item salvo! Selo:", seloNumParaGravar);
-    
-//     await carregarItens(); 
-//     focarUltimoRegistro(); 
+
+//     await carregarItens();
+//     focarUltimoRegistro();
 //     limparCamposAposRegistro();
-    
+
 //     // ✅ CHAMADA CRÍTICA: Atualiza o contador de 995 para 994 (ou vice-versa)
 //     if (typeof sincronizarPainelSelos === "function") {
 //         await sincronizarPainelSelos();
@@ -653,7 +672,7 @@ document.addEventListener('keydown', (e) => {
 //     // Se houver função de resetar botão de edição
 //     if (typeof resetarBotaoRegistro === "function") resetarBotaoRegistro();
 
-//   } catch (err) { 
+//   } catch (err) {
 //     console.error("Erro no salvamento:", err);
 //     alert("Erro ao salvar: " + (err.message || "Erro desconhecido."));
 //   }
@@ -665,17 +684,17 @@ async function registrarItem() {
   const nomeOperadorLogado = localStorage.getItem("nome_operador");
   const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
 
-  if (typeof fabricanteValido !== 'undefined' && !fabricanteValido) {
-      exibirAlertaErro("ID do Fabricante não encontrado no banco de dados.");
-      
-      const inputFab = document.getElementById('X_input_id');
-      if (inputFab) {
-          inputFab.focus();
-          inputFab.classList.add('input-error-shake');
-          // Remove a classe de erro após 2 segundos para o usuário tentar de novo
-          setTimeout(() => inputFab.classList.remove('input-error-shake'), 2000);
-      }
-      return; 
+  if (typeof fabricanteValido !== "undefined" && !fabricanteValido) {
+    exibirAlertaErro("ID do Fabricante não encontrado no banco de dados.");
+
+    const inputFab = document.getElementById("X_input_id");
+    if (inputFab) {
+      inputFab.focus();
+      inputFab.classList.add("input-error-shake");
+      // Remove a classe de erro após 2 segundos para o usuário tentar de novo
+      setTimeout(() => inputFab.classList.remove("input-error-shake"), 2000);
+    }
+    return;
   }
 
   if (!validarAnoReteste()) return;
@@ -688,12 +707,12 @@ async function registrarItem() {
   try {
     // 2. BUSCA O SELO REAL NO BANCO (O GATILHO DO FLASH)
     // Chamamos uma vez só aqui no início do try
-    const checagem = await sincronizarPainelSelos(); 
-    
+    const checagem = await sincronizarPainelSelos();
+
     // Se a função retornar que não pode gravar (lote vazio), paramos aqui
     if (window.proximoSeloCalculado === undefined) {
-       alert("⚠️ Erro ao calcular próximo selo ou lote esgotado.");
-       return;
+      alert("⚠️ Erro ao calcular próximo selo ou lote esgotado.");
+      return;
     }
 
     const seloNumParaGravar = window.proximoSeloCalculado;
@@ -709,25 +728,28 @@ async function registrarItem() {
     };
 
     const checks = document.querySelectorAll(".custom-checkbox");
-    const textoReteste = document.getElementById("display_prox_reteste")?.innerText;
-    const textoRecarga = document.getElementById("display_prox_recarga")?.innerText;
+    const textoReteste = document.getElementById(
+      "display_prox_reteste",
+    )?.innerText;
+    const textoRecarga = document.getElementById(
+      "display_prox_recarga",
+    )?.innerText;
 
     // 3. MONTAGEM DO OBJETO DE DADOS
     const dados = {
-
-
       os_number: osAtiva,
       empresa_id: empresaIdLogada,
       usuario_alteracao: nomeOperadorLogado || "Sistema",
-      
+
       // ✅ SEQUÊNCIA CORRETA
-      usuario_alteracao: window.editandoID ? (nomeOperadorLogado || "Sistema") : nomeOperadorLogado,
+      usuario_alteracao: window.editandoID
+        ? nomeOperadorLogado || "Sistema"
+        : nomeOperadorLogado,
       updated_at: new Date().toISOString(),
       selo_inmetro: seloNumParaGravar,
       prefixo_selo: prefixoParaGravar,
       cod_barras: "21" + seloNumParaGravar.toString().padStart(6, "0"),
-     
-      
+
       nr_cilindro: limpar("nr_cilindro"),
       num_patrimonio: limpar("N-Patrimonio") || limpar("pallet"),
       fabricante_id: limpar("X_input_id", "num"),
@@ -737,10 +759,12 @@ async function registrarItem() {
       ano_fab: limpar("ano_fab", "num"),
       ult_reteste: limpar("ult_reteste", "num"),
 
-      prox_reteste: textoReteste && textoReteste !== "----" ? parseInt(textoReteste) : null,
-      prox_recarga: typeof converterDataBRparaISO === "function" 
-        ? converterDataBRparaISO(textoRecarga) 
-        : null,
+      prox_reteste:
+        textoReteste && textoReteste !== "----" ? parseInt(textoReteste) : null,
+      prox_recarga:
+        typeof converterDataBRparaISO === "function"
+          ? converterDataBRparaISO(textoRecarga)
+          : null,
 
       p_vazio_valvula: limpar("p_vazio_valvula", "num"),
       p_cheio_valvula: limpar("p_cheio_valvula", "num"),
@@ -752,7 +776,8 @@ async function registrarItem() {
       dvp_ep: limpar("dvp_ep", "num"),
 
       nivel_manutencao: window.selectedLevel || 2,
-      status_servico: document.getElementById("resultado_valor")?.value || "APROVADO",
+      status_servico:
+        document.getElementById("resultado_valor")?.value || "APROVADO",
       lote_nitrogenio: limpar("lote_nitrogenio"),
       ampola_vinculada: limpar("ampola_vinculada"),
       deposito_galpao: limpar("deposito_galpao"),
@@ -760,8 +785,31 @@ async function registrarItem() {
     };
 
     // 4. MAPEAMENTO DE COMPONENTES
-    const listaComp = ["pistola","valvula","bucha","sifao","punho_pino","quebra_jato","manometro","mangueira","cord_plastico","saia_plastica","conj_apague","difusor","pera_ved","mola_rosca","conj_miolo","conj_haste","anel_oring","sifao_aluminio","conj_seguranca","haste_valvula","gancho_sup","trava_corrente"];
-    listaComp.forEach(item => {
+    const listaComp = [
+      "pistola",
+      "valvula",
+      "bucha",
+      "sifao",
+      "punho_pino",
+      "quebra_jato",
+      "manometro",
+      "mangueira",
+      "cord_plastico",
+      "saia_plastica",
+      "conj_apague",
+      "difusor",
+      "pera_ved",
+      "mola_rosca",
+      "conj_miolo",
+      "conj_haste",
+      "anel_oring",
+      "sifao_aluminio",
+      "conj_seguranca",
+      "haste_valvula",
+      "gancho_sup",
+      "trava_corrente",
+    ];
+    listaComp.forEach((item) => {
       const el = document.getElementById(`comp_${item}`);
       dados[`comp_${item}`] = el ? el.checked : false;
     });
@@ -769,7 +817,10 @@ async function registrarItem() {
     // 5. SALVAMENTO
     let resultado;
     if (window.editandoID) {
-      resultado = await _supabase.from("itens_os").update(dados).eq("id", window.editandoID);
+      resultado = await _supabase
+        .from("itens_os")
+        .update(dados)
+        .eq("id", window.editandoID);
     } else {
       resultado = await _supabase.from("itens_os").insert([dados]);
     }
@@ -778,27 +829,23 @@ async function registrarItem() {
 
     // 6. SUCESSO - O FLASH DE LUZ ESTÁ AQUI
     console.log("Item salvo! Selo:", seloNumParaGravar);
-    
-    await carregarItens(); 
-    focarUltimoRegistro(); 
+
+    await carregarItens();
+    focarUltimoRegistro();
     limparCamposAposRegistro();
-    
+
     // ✅ CHAMADA CRÍTICA: Atualiza o contador de 995 para 994 (ou vice-versa)
     if (typeof sincronizarPainelSelos === "function") {
-        await sincronizarPainelSelos();
+      await sincronizarPainelSelos();
     }
 
     // Se houver função de resetar botão de edição
     if (typeof resetarBotaoRegistro === "function") resetarBotaoRegistro();
-
-  } catch (err) { 
+  } catch (err) {
     console.error("Erro no salvamento:", err);
     alert("Erro ao salvar: " + (err.message || "Erro desconhecido."));
   }
 }
-
-
-
 
 function converterDataBRparaISO(dataBR) {
   if (
@@ -978,6 +1025,18 @@ document.addEventListener("keydown", function (e) {
   }
 });
 
+window.carregarItens = carregarItens;
+window.deletarItem = deletarItem;
+window.prepararEdicao = prepararEdicao;
+window.focarUltimoRegistro = focarUltimoRegistro;
+window.renderItens = renderItens;
+window.destacarLinha = destacarLinha;
+window.configurarCliquesTabela = configurarCliquesTabela;
+window.destacarUltimaLinha = destacarUltimaLinha;
+window.registrarItem = registrarItem;
+window.converterDataBRparaISO = converterDataBRparaISO;
+window.limparCamposAposRegistro = limparCamposAposRegistro;
+
 // --- VERIFICAÇÃO DE SEGURANÇA DO LOTE (COLE NO FIM DO ARQUIVO) ---
 // async function verificarDisponibilidadeSeloRealtime() {
 //   try {
@@ -1027,4 +1086,3 @@ document.addEventListener("keydown", function (e) {
 //     return { podeGravar: false, motivo: "Falha de comunicação com o banco." };
 //   }
 // }
-

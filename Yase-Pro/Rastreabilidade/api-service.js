@@ -9,26 +9,28 @@
 // const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function loadItens() {
-    try {
-        const { data, error } = await _supabase
-            .from("itens_os")
-            .select("*")
-            .eq("os_number", currentOS)
-            .order("created_at", { ascending: false });
+  try {
+    const { data, error } = await _supabase
+      .from("itens_os")
+      .select("*")
+      .eq("os_number", currentOS)
+      .order("created_at", { ascending: false });
 
-        if (error) throw error;
-        renderItens(data); // Chama a função do renderizarTabela.js
-    } catch (error) {
-        console.error("Erro ao carregar itens:", error);
-    }
+    if (error) throw error;
+    renderItens(data); // Chama a função do renderizarTabela.js
+  } catch (error) {
+    console.error("Erro ao carregar itens:", error);
+  }
 }
 
 async function deletarItem(id) {
-    try {
-        const { error } = await _supabase.from("itens_os").delete().eq("id", id);
-        if (error) throw error;
-        loadItens();
-    } catch (error) {
-        alert("Erro ao excluir item.");
-    }
+  try {
+    const { error } = await _supabase.from("itens_os").delete().eq("id", id);
+    if (error) throw error;
+    loadItens();
+  } catch (error) {
+    alert("Erro ao excluir item.");
+  }
 }
+window.loadItens = loadItens;
+window.deletarItem = deletarItem;
