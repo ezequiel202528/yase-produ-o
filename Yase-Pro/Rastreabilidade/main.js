@@ -105,37 +105,32 @@
 //   }
 // });
 // Configuração do Supabase (YaSe PRO)
+// Configuração do Supabase
 const SUPABASE_URL = "https://gzojpxgpgjapsegerscb.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s";
 
-// Variável global que todos os outros arquivos (renderizarTabela, EditarExcluir, etc) usam
+// Variável global de conexão
 window._supabase = null;
 
-// Função de conexão segura que aguarda a biblioteca do CDN estar pronta
+// Função de conexão com espera (Timeout)
 function conectarAoBanco() {
   if (window.supabase) {
     window._supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log("YaSe PRO: Banco conectado com sucesso!");
-    
-    // Se a página já carregou a OS, dispara a busca inicial de itens
-    if (window.currentOS) {
-      loadItens();
-    }
+    console.log("YaSe PRO: Banco conectado!");
+    if (window.currentOS) loadItens();
   } else {
-    // Se a biblioteca ainda não carregou, tenta novamente em 100ms
     setTimeout(conectarAoBanco, 100);
   }
 }
 
-// Inicia o processo de conexão
 conectarAoBanco();
 
-// Variáveis de controle global
+// Variáveis Globais
 window.currentOS = "";
 let selectedLevel = 1;
 let editandoID = null;
 
-// Inicialização da página ao carregar
+// Inicialização da Página
 window.onload = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   window.currentOS = urlParams.get("os") || sessionStorage.getItem("currentOS");
@@ -146,38 +141,20 @@ window.onload = async () => {
     return;
   }
 
-  // Atualiza os elementos visuais do cabeçalho
   const displayOS = document.getElementById("displayOS");
-  const osBadgeNumber = document.getElementById("osBadgeNumber");
-
   if (displayOS) displayOS.innerText = window.currentOS;
-  if (osBadgeNumber) osBadgeNumber.innerText = `OS: ${window.currentOS}`;
 
-  // Define a data de hoje por padrão no campo de selagem
-  const hoje = new Date().toISOString().split("T")[0];
   const campoData = document.getElementById("data_selagem");
-  if (campoData) campoData.value = hoje;
+  if (campoData) campoData.value = new Date().toISOString().split("T")[0];
 
-  // Pequeno delay para garantir que o _supabase foi criado pela função conectarAoBanco
   setTimeout(() => {
-    if (window._supabase) {
-      loadItens();
-      
-      // Tenta focar no último registro após a renderização (se a função existir)
-      setTimeout(() => {
-        if (typeof focarUltimoRegistro === "function") {
-          focarUltimoRegistro();
-        }
-      }, 600);
-    }
+    if (window._supabase) loadItens();
   }, 500);
 };
 
-// Função centralizada para carregar itens da OS atual
-// Função centralizada para carregar itens da OS atual
+// FUNÇÃO PRINCIPAL (Nome padronizado como loadItens)
 async function loadItens() {
   if (!window._supabase) return;
-  
   try {
     const { data, error } = await window._supabase
       .from("itens_os")
@@ -186,19 +163,16 @@ async function loadItens() {
       .order("created_at", { ascending: true });
 
     if (error) throw error;
-
-    // IMPORTANTE: Verifica se a função de renderizar existe antes de chamar
-    if (typeof renderItens === "function") {
-      renderItens(data);
-    } else {
-      console.warn("Aviso: Função renderItens ainda não foi carregada.");
-    }
+    if (typeof renderItens === "function") renderItens(data);
   } catch (error) {
-    console.error("Erro ao carregar itens no main.js:", error);
+    console.error("Erro ao carregar itens:", error);
   }
 }
 
-// Escuta mudanças no banco em tempo real
+// ALIAS: Criamos este apelido para que, se algum outro arquivo chamar 'carregarItens', não dê erro
+window.carregarItens = loadItens;
+
+// Realtime corrigido para usar o nome certo da função
 function ativarRealtime() {
     if (!window._supabase) {
         setTimeout(ativarRealtime, 500);
@@ -208,12 +182,13 @@ function ativarRealtime() {
       .channel("custom-all-channel")
       .on("postgres_changes", { event: "*", schema: "public", table: "itens_os" }, (payload) => {
           console.log("Mudança detectada!", payload);
-          loadItens(); // AQUI: Estava 'carregarItens', o correto é 'loadItens'
+          loadItens(); // Usando o nome correto aqui
       })
       .subscribe();
 }
 ativarRealtime();
-// Evento para atualizar o título da pesagem conforme o tipo de carga
+
+// Eventos de Interface
 document.addEventListener("DOMContentLoaded", () => {
   const campoCarga = document.getElementById("tipo_carga");
   if (campoCarga) {
@@ -223,17 +198,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (titulo) titulo.innerText = "Pesagem " + valor;
     });
   }
-
-  // Recupera o nome do operador para exibição
-  const nomeOperador = localStorage.getItem("nome_operador");
-  const displayElement = document.getElementById("nome-operador-logado");
-  if (displayElement && nomeOperador) {
-    displayElement.textContent = nomeOperador.toUpperCase();
-  }
 });
 
-// Função de Logout
 function logout() {
   sessionStorage.clear();
-  window.location.href = "index.html";
+  window.location.href = "EntrarSistema.html";
 }
