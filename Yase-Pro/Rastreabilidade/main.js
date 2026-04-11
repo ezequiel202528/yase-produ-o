@@ -174,6 +174,7 @@ window.onload = async () => {
 };
 
 // Função centralizada para carregar itens da OS atual
+// Função centralizada para carregar itens da OS atual
 async function loadItens() {
   if (!window._supabase) return;
   
@@ -186,15 +187,32 @@ async function loadItens() {
 
     if (error) throw error;
 
-    // Chama a função de renderização que está no renderizarTabela.js
+    // IMPORTANTE: Verifica se a função de renderizar existe antes de chamar
     if (typeof renderItens === "function") {
       renderItens(data);
+    } else {
+      console.warn("Aviso: Função renderItens ainda não foi carregada.");
     }
   } catch (error) {
     console.error("Erro ao carregar itens no main.js:", error);
   }
 }
 
+// Escuta mudanças no banco em tempo real
+function ativarRealtime() {
+    if (!window._supabase) {
+        setTimeout(ativarRealtime, 500);
+        return;
+    }
+    window._supabase
+      .channel("custom-all-channel")
+      .on("postgres_changes", { event: "*", schema: "public", table: "itens_os" }, (payload) => {
+          console.log("Mudança detectada!", payload);
+          loadItens(); // AQUI: Estava 'carregarItens', o correto é 'loadItens'
+      })
+      .subscribe();
+}
+ativarRealtime();
 // Evento para atualizar o título da pesagem conforme o tipo de carga
 document.addEventListener("DOMContentLoaded", () => {
   const campoCarga = document.getElementById("tipo_carga");
