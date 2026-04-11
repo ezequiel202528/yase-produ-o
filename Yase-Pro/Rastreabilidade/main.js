@@ -10,8 +10,9 @@ window.currentOS = "";
 let selectedLevel = 1;
 let editandoID = null;
 // Inicialização ao carregar a página
-window.onload = async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   console.log("🚀 Iniciando carregamento de Rastreabilidade...");
+  console.log("✅ Supabase inicializado:", _supabase ? "SIM" : "NÃO");
 
   const urlParams = new URLSearchParams(window.location.search);
   window.currentOS =
@@ -31,6 +32,9 @@ window.onload = async () => {
   const campoData = document.getElementById("data_selagem");
   if (campoData) campoData.value = hoje;
 
+  // Verifica se renderItens existe
+  console.log("✅ renderItens disponível:", typeof renderItens === "function" ? "SIM" : "NÃO");
+
   // --- CARREGAMENTO INICIAL ---
   console.log("📥 Carregando itens do Supabase...");
   await loadItens();
@@ -41,12 +45,16 @@ window.onload = async () => {
       focarUltimoRegistro();
     }
   }, 600);
-};
+});
 
 // Ajuste na função loadItens para garantir a ordem correta
 async function loadItens() {
   try {
     console.log("🔍 Buscando itens para OS:", window.currentOS);
+    
+    // Verifica se o elemento da tabela existe
+    const tabelaElement = document.getElementById("itensList");
+    console.log("✅ Tabela DOM encontrada:", tabelaElement ? "SIM" : "NÃO");
 
     const { data, error } = await _supabase
       .from("itens_os")
@@ -60,11 +68,12 @@ async function loadItens() {
     }
 
     console.log("✅ Dados recebidos:", data?.length || 0, "itens");
+    console.log("📊 Primeiros dados:", data?.[0] || "vazio");
 
     // Chama renderItens com os dados
     if (typeof renderItens === "function") {
       renderItens(data);
-      console.log("✅ Tabela renderizada");
+      console.log("✅ Tabela renderizada com sucesso");
     } else {
       console.error("❌ renderItens não está definida!");
     }
@@ -80,14 +89,15 @@ function logout() {
 }
 
 // Para que o "Pesagem ABC"
-// mude automaticamente quando você trocar o tipo de extintor,
-// adicione isso ao seu arquivo de scripts:
-
-// Exemplo de como mudar o nome conforme a carga
-document.getElementById("tipo_carga").addEventListener("change", function () {
-  const valor = this.value || "ABC";
-  document.getElementById("titulo_pesagem").innerText = "Pesagem " + valor;
-});
+// mude automaticamente quando você trocar o tipo de extintor
+const tipoCargaElement = document.getElementById("tipo_carga");
+if (tipoCargaElement) {
+  tipoCargaElement.addEventListener("change", function () {
+    const valor = this.value || "ABC";
+    const titulo = document.getElementById("titulo_pesagem");
+    if (titulo) titulo.innerText = "Pesagem " + valor;
+  });
+}
 
 // Escuta mudanças no banco em tempo real
 _supabase
