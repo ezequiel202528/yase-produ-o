@@ -107,11 +107,13 @@ async function deletarTipo(id) {
 }
 
 window.abrirModalTipo = () => {
-  document.getElementById("modalTipo")?.classList.replace("hidden", "flex");
+  const modal = document.getElementById("modalTipo");
+  modal?.classList.remove("hidden");
+  modal?.classList.add("flex");
   carregarTipos();
 };
 window.fecharModalTipo = () =>
-  document.getElementById("modalTipo")?.classList.replace("flex", "hidden");
+  document.getElementById("modalTipo")?.classList.add("hidden");
 window.salvarTipo = salvarTipo;
 window.selecionarTipo = selecionarTipo;
 window.prepararEdicaoTipo = prepararEdicaoTipo;
