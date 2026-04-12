@@ -425,18 +425,17 @@ function renderItens(itens) {
         : "Sem alterações";
       const usuarioAlt = item.usuario_alteracao || "-";
 
-      // Extrai o nome do fabricante (mesmo dado que o span de preview recebe)
-      // Tenta plural, singular ou primeiro item de um array
-      let nomeFabRaw = item.fabricantes?.nome || item.fabricante?.nome;
+      // Lógica Metódica: Prioriza o Nome vindo do Join, senão usa o ID
+      let nomeExibicao = item.fabricante_id || "-";
 
-      if (!nomeFabRaw && Array.isArray(item.fabricantes)) {
-        nomeFabRaw = item.fabricantes[0]?.nome;
+      // Verifica se o Supabase trouxe o objeto relacionado (fabricantes ou fabricante)
+      const relacaoFab = item.fabricantes || item.fabricante;
+      if (relacaoFab) {
+        const nomeBruto = Array.isArray(relacaoFab)
+          ? relacaoFab[0]?.nome
+          : relacaoFab.nome;
+        if (nomeBruto) nomeExibicao = String(nomeBruto).toUpperCase();
       }
-
-      let nomeFab = nomeFabRaw ? String(nomeFabRaw).toUpperCase() : null;
-
-      if (nomeFab) nomeFab = nomeFab.toUpperCase();
-
       return `
         <tr data-index="${index}" class="group text-[11px] border-b border-slate-800 hover:bg-slate-800/40 transition-colors whitespace-nowrap ${corDaLinha}">
           <td class="p-3 sticky left-0 z-[40] bg-[#0f172a] border-r border-slate-700 font-bold group-hover:bg-[#1e293b] transition-colors">
@@ -447,7 +446,7 @@ function renderItens(itens) {
           </td>
           <td class="p-3 font-bold text-slate-200">${item.nr_cilindro || "S/N"}</td>
           <td class="p-3 font-bold text-slate-300">${item.nbr || "-"}</td>
-          <td class="p-3 font-bold text-slate-300">${nomeFab || item.fabricante_id || "-"}</td>
+          <td class="p-3 font-bold text-slate-300">${nomeExibicao}</td>
           <td class="p-3">${item.ano_fab || "-"}</td>
           <td class="p-3">${item.ult_reteste || "-"}</td>
           <td class="px-4 py-3 text-xs font-bold text-orange-500">${item.prox_reteste || "-"}</td>

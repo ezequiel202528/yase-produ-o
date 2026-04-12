@@ -93,10 +93,7 @@ async function loadItens() {
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.warn(
-        "⚠️ Fallback no loadItens devido a erro no Join:",
-        error.message,
-      );
+      console.warn("⚠️ Fallback no loadItens:", error.message);
       const fallback = await _supabase
         .from("itens_os")
         .select("*")
