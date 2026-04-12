@@ -425,10 +425,12 @@ function renderItens(itens) {
         : "Sem alterações";
       const usuarioAlt = item.usuario_alteracao || "-";
 
-      // Lógica resiliente para pegar o nome do fabricante (suporta objeto ou array de retorno)
-      const nomeFab = Array.isArray(item.fabricantes)
+      // Extrai o nome do fabricante (mesmo dado que o span de preview recebe)
+      let nomeFab = Array.isArray(item.fabricantes)
         ? item.fabricantes[0]?.nome
         : item.fabricantes?.nome;
+
+      if (nomeFab) nomeFab = nomeFab.toUpperCase();
 
       return `
         <tr data-index="${index}" class="group text-[11px] border-b border-slate-800 hover:bg-slate-800/40 transition-colors whitespace-nowrap ${corDaLinha}">
@@ -439,8 +441,8 @@ function renderItens(itens) {
               ${item.prefixo_selo ? item.prefixo_selo + "-" : ""}${item.selo_inmetro ?? "-"}
           </td>
           <td class="p-3 font-bold text-slate-200">${item.nr_cilindro || "S/N"}</td>
-          <td class="p-3">${item.nbr || "-"}</td>
-          <td class="p-3">${nomeFab || item.fabricante_id || "-"}</td>
+          <td class="p-3 font-bold text-slate-300">${item.nbr || "-"}</td>
+          <td class="p-3 font-bold text-slate-300">${nomeFab || item.fabricante_id || "-"}</td>
           <td class="p-3">${item.ano_fab || "-"}</td>
           <td class="p-3">${item.ult_reteste || "-"}</td>
           <td class="px-4 py-3 text-xs font-bold text-orange-500">${item.prox_reteste || "-"}</td>
