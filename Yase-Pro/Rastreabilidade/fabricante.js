@@ -4,7 +4,7 @@ const getSupa = () => window._supabase || window.supabase;
 function renderizarListaFabricantes(lista) {
   const container = document.getElementById("listaFabricantes");
   if (!container) return;
-  
+
   container.innerHTML = (lista || [])
     .map(
       (fab) => `
@@ -14,10 +14,26 @@ function renderizarListaFabricantes(lista) {
                 <span class="text-slate-200 text-xs font-bold uppercase">${fab.nome}</span>
             </div>
         `,
-      )
-      .join("");
-  }
+    )
+    .join("");
+}
 
+/**
+ * Busca a lista de fabricantes do Supabase e renderiza no modal
+ */
+async function carregarFabricantes() {
+  try {
+    const { data, error } = await getSupa()
+      .from("fabricantes")
+      .select("id, nome")
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+    renderizarListaFabricantes(data);
+  } catch (err) {
+    console.error("Erro ao carregar fabricantes:", err);
+  }
+}
 
 function selecionarFabricante(id, nome) {
   // 1. Encontra o input de ID do fabricante
@@ -68,7 +84,7 @@ async function cadastrarFabricante() {
 
   if (!nome) return;
 
-  // ALTERADO: de 'supabase' para '_supabase'
+  const _supabase = getSupa();
   const { data, error } = await _supabase
     .from("fabricantes")
     .insert([{ nome }])
@@ -239,5 +255,3 @@ window.filtrarFabricantes = filtrarFabricantes;
 window.buscarNomeFabricante = buscarNomeFabricante;
 window.validarFabricanteAntesDeSeguir = validarFabricanteAntesDeSeguir;
 window.exibirAlertaErro = exibirAlertaErro;
-// Vincula ao evento de input do HTML
-window.buscarNomeFabricante = buscarNomeFabricante;
