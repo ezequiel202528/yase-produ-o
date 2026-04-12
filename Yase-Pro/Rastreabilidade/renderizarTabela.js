@@ -911,12 +911,16 @@ function limparCamposAposRegistro() {
   // Usamos innerText porque eles não são inputs de digitação
   const displayRecarga = document.getElementById("display_prox_recarga");
   const displayReteste = document.getElementById("display_prox_reteste");
+  const displayFabricante = document.getElementById("nome_fabricante_preview");
 
   if (displayRecarga) {
     displayRecarga.innerText = "--/--/----"; // Limpa o campo Azul
   }
   if (displayReteste) {
     displayReteste.innerText = "----"; // Limpa o campo Vermelho
+  }
+  if (displayFabricante) {
+    displayFabricante.innerText = ""; // Limpa o nome do fabricante
   }
 
   // 3. Reset dos Checkboxes
@@ -936,6 +940,7 @@ function limparCamposAposRegistro() {
 
   // 5. Reset de Estado (Nível 2 padrão)
   window.editandoID = null;
+  window.fabricanteValido = false;
   if (typeof setLevel === "function") {
     setLevel(2);
   }
