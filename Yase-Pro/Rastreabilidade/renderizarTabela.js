@@ -44,19 +44,21 @@ async function carregarItens() {
     const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
     if (!osAtiva) return;
 
-    // 1. Consulta metódica: Forçamos o Join usando a coluna específica fabricante_id
+    // Fazemos o Select buscando todos os dados do item + o nome da tabela fabricantes
     let { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes!fabricante_id(nome)")
+      .select(`
+        *,
+        fabricantes!fabricante_id (
+          nome
+        )
+      `)
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
-    // 2. Se o Join falhar, tentamos a consulta padrão, mas o código de renderização tratará o ID
     if (error) {
-      console.warn(
-        "⚠️ Erro no Join (Nomes). Renderizando IDs como fallback: ",
-        error.message,
-      );
+      console.warn("⚠️ Erro ao buscar nomes dos fabricantes, usando IDs:", error.message);
+      // Fallback para não travar a tela caso o relacionamento falhe
       const fallback = await _supabase
         .from("itens_os")
         .select("*")
@@ -71,8 +73,6 @@ async function carregarItens() {
     if (contadorEl) contadorEl.innerText = data ? data.length : 0;
 
     renderItens(data);
-
-    // --- NOVIDADE: Após renderizar, seleciona a última e ativa cliques ---
     configurarCliquesTabela();
     destacarUltimaLinha();
   } catch (err) {
@@ -382,8 +382,7 @@ function renderItens(itens) {
   }
 
   const formatarDataLocal = (dataStr) => {
-    if (!dataStr || dataStr === "" || dataStr === "-" || dataStr === "null")
-      return "-";
+    if (!dataStr || dataStr === "" || dataStr === "-" || dataStr === "null") return "-";
     if (dataStr.length === 10) {
       const [ano, mes, dia] = dataStr.split("-");
       return `${dia}/${mes}/${ano}`;
@@ -391,48 +390,33 @@ function renderItens(itens) {
     const d = new Date(dataStr);
     if (isNaN(d.getTime())) return dataStr;
     return d.toLocaleString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
     });
   };
 
-  list.innerHTML = itens
-    .map((item, index) => {
-      // 1. Definição de Status e Cores
-      const s = (
-        item.status ||
-        item.status_servico ||
-        "APROVADO"
-      ).toUpperCase();
-      const corDaLinha =
-        s === "INUTILIZADO" ? "text-red-500 font-bold" : "text-slate-300";
+  list.innerHTML = itens.map((item, index) => {
+      const s = (item.status || item.status_servico || "APROVADO").toUpperCase();
+      const corDaLinha = s === "INUTILIZADO" ? "text-red-500 font-bold" : "text-slate-300";
 
-      let classesStatus =
-        "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+      let classesStatus = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
       if (s === "REPROVADO" || s === "REP" || s === "INUTILIZADO") {
         classesStatus = "bg-red-500/10 text-red-400 border-red-500/20";
       } else if (s === "NOVO") {
         classesStatus = "bg-amber-500/10 text-amber-400 border-amber-500/20";
       }
 
-      // --- AJUSTE AQUI: Variáveis dentro do MAP para ler cada item ---
       const dataLancamento = formatarDataLocal(item.created_at);
-      const dataAlteracao = item.updated_at
-        ? formatarDataLocal(item.updated_at)
-        : "Sem alterações";
-      const usuarioAlt = item.usuario_alteracao || "-";
-
-      // 3. Extração metódica do nome: Prioridade total ao Nome do Fabricante
-      const relacao = item.fabricantes;
+      const dataAlteracao = item.updated_at ? formatarDataLocal(item.updated_at) : "Sem alterações";
+      
+      // --- LÓGICA DE TRADUÇÃO DO ID PARA NOME ---
       let nomeExibicao = item.fabricante_id || "-";
-
-      if (relacao) {
-        const nomeBruto = Array.isArray(relacao)
-          ? relacao[0]?.nome
-          : relacao.nome;
+      if (item.fabricantes) {
+        // O Supabase retorna um objeto ou array dependendo da config. Tratamos ambos:
+        const nomeBruto = Array.isArray(item.fabricantes) 
+          ? item.fabricantes[0]?.nome 
+          : item.fabricantes.nome;
+        
         if (nomeBruto) nomeExibicao = String(nomeBruto).toUpperCase();
       }
 
@@ -446,44 +430,36 @@ function renderItens(itens) {
           </td>
           <td class="p-3 font-bold text-slate-200">${item.nr_cilindro || "S/N"}</td>
           <td class="p-3 font-bold text-slate-300 uppercase">${item.nbr || "-"}</td>
+          
           <td class="p-3 font-bold text-slate-300">${nomeExibicao}</td>
+          
           <td class="p-3">${item.ano_fab || "-"}</td>
           <td class="p-3">${item.ult_reteste || "-"}</td>
           <td class="px-4 py-3 text-xs font-bold text-orange-500">${item.prox_reteste || "-"}</td>
           <td class="p-3 text-amber-500 font-bold">${item.prox_recarga || "-"}</td>
-
-          <td class="p-3 font-bold text-indigo-400">
-              ${item.tipo_carga || "-"} / ${item.capacidade || "-"}
-          </td>
-
+          <td class="p-3 font-bold text-indigo-400">${item.tipo_carga || "-"} / ${item.capacidade || "-"}</td>
           <td class="p-3">${item.usuario_lancamento || "-"}</td>
           <td class="p-3 text-center">${item.nivel_manutencao || "2"}</td>
-
           <td class="p-3">
               <span class="px-2 py-0.5 rounded border font-bold text-[9px] ${classesStatus}">
                   ${s}
               </span>
           </td>
-
           <td class="p-3 bg-orange-500/5 border-l border-slate-800">${item.p_vazio_valvula || "-"}</td>
           <td class="p-3 bg-orange-500/5">${item.p_cheio_valvula || "-"}</td>
           <td class="p-3 bg-orange-500/5 font-bold text-orange-300">${item.p_atual || "-"}</td>
           <td class="p-3 bg-orange-500/5">${item.porcent_dif || "0"}%</td>
-
           <td class="p-3 bg-emerald-500/5 border-l border-slate-800">${item.tara_cilindro || "-"}</td>
           <td class="p-3 bg-emerald-500/5">${item.p_cil_vazio_kg || "-"}</td>
           <td class="p-3 bg-emerald-500/5 text-emerald-400">${item.perda_massa_porcent || "0"}%</td>
-
           <td class="p-3 bg-blue-500/5 border-l border-slate-800">${item.vol_litros || "-"}</td>
           <td class="p-3 bg-blue-500/5">${item.dvh || "-"}</td>
           <td class="p-3 bg-blue-500/5">${item.dvp || "-"}</td>
           <td class="p-3 bg-blue-500/5">${item.ee || "-"}</td>
-
           <td class="p-3 bg-red-500/5 border-l border-slate-800">${item.dvm_et || "-"}</td>
           <td class="p-3 bg-red-500/5">${item.dvp_ep || "-"}</td>
           <td class="p-3 bg-red-500/5">${item.ee_calculado || "-"}</td>
           <td class="p-3 bg-red-500/5 font-bold text-red-400">${item.ep_porcent_final || "0"}%</td>
-
           <td class="p-3 text-slate-400 text-[10px]">${dataLancamento}</td>
           <td class="p-3 text-[10px]">${item.cod_barras || "-"}</td>
           <td class="p-4">${item.lote_nitrogenio || "-"}</td>
@@ -491,15 +467,8 @@ function renderItens(itens) {
           <td class="p-3">${item.deposito_galpao || "-"}</td>
           <td class="p-3 font-bold text-indigo-400 bg-indigo-500/5 text-center border-x border-slate-800/20">${item.num_patrimonio || "-"}</td>
           <td class="p-3">${item.local_especifico || item.local_extintor || "-"}</td>
-
-          <td class="p-3 text-[9px] text-slate-500 italic">
-            ${dataAlteracao}
-          </td>
-
-          <td class="p-3 text-[9px] font-bold text-amber-600/80">
-            ${usuarioAlt}
-          </td>
-
+          <td class="p-3 text-[9px] text-slate-500 italic">${dataAlteracao}</td>
+          <td class="p-3 text-[9px] font-bold text-amber-600/80">${item.usuario_alteracao || "-"}</td>
           <td class="p-3 sticky right-0 z-20 bg-[#0f172a] border-l border-slate-700 text-right pr-4 shadow-[-5px_0_10px_rgba(0,0,0,0.3)] group-hover:bg-[#1e293b] transition-colors">
               <div class="flex gap-2 justify-end">
                 <button onclick="prepararEdicao('${item.id}')" class="text-amber-500 hover:text-amber-400"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -510,8 +479,7 @@ function renderItens(itens) {
               </div>
           </td>
         </tr>`;
-    })
-    .join("");
+    }).join("");
 }
 
 // 3. LÓGICA DE DESTAQUE E NAVEGAÇÃO
