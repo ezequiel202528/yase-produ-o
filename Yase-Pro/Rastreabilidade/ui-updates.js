@@ -43,9 +43,9 @@ function fecharModalComponentes() {
 
 // Funções de busca rápida (Placeholders para evitar erro de 'not defined')
 function X_ABRIR_TIPO() {
-  alert(
-    "Funcionalidade de busca de Tipos será implementada na próxima versão.",
-  );
+  if (typeof window.abrirModalTipo === "function") {
+    window.abrirModalTipo();
+  }
 }
 
 function openCapacidadeModal() {
