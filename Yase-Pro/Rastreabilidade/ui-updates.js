@@ -55,9 +55,9 @@ function openCapacidadeModal() {
 }
 
 function X_ABRIR_NBR() {
-  alert(
-    "Funcionalidade de busca de Normas NBR será implementada na próxima versão.",
-  );
+  if (typeof window.abrirModalNBR === "function") {
+    window.abrirModalNBR();
+  }
 }
 
 window.abrirModalComponentes = abrirModalComponentes;

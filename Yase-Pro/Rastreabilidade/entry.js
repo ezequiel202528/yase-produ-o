@@ -11,3 +11,4 @@ import "./relatorioHidro.js";
 import "./etiquetas.js";
 import "./buscarCilindro.js";
 import "./inutilizar.js";
+import "./nbr.js";
