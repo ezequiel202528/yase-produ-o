@@ -42,19 +42,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (campoData) campoData.value = hoje;
 
   // --- CARREGAMENTO INICIAL ---
-  // Limpa campos com um pequeno delay para vencer o autofill do navegador
-  setTimeout(() => {
-    const f1 = document.getElementById("X_input_id");
-    const f2 = document.getElementById("nr_cilindro");
-    if (f1) {
-      f1.value = "";
-      f1.blur();
-    }
-    if (f2) {
-      f2.value = "";
-      f2.blur();
-    }
-  }, 200);
+  // Limpeza agressiva contra Autofill (0013 bug)
+  const forcarLimpeza = () => {
+    const ids = ["X_input_id", "nr_cilindro", "inputBuscaModal"];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.value = "";
+        el.setAttribute("value", ""); // Limpa o atributo HTML também
+      }
+    });
+    const preview = document.getElementById("nome_fabricante_preview");
+    if (preview) preview.innerText = "";
+  };
+
+  // Executa a limpeza em múltiplos intervalos para garantir que o Chrome não preencha depois
+  forcarLimpeza();
+  setTimeout(forcarLimpeza, 100);
+  setTimeout(forcarLimpeza, 500);
+  setTimeout(forcarLimpeza, 2000);
 
   console.log("📥 Carregando itens do Supabase...");
   if (typeof window.carregarItens === "function") await window.carregarItens();
