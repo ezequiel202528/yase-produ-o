@@ -294,3 +294,5 @@ window.filtrarFabricantes = filtrarFabricantes;
 window.buscarNomeFabricante = buscarNomeFabricante;
 window.validarFabricanteAntesDeSeguir = validarFabricanteAntesDeSeguir;
 window.exibirAlertaErro = exibirAlertaErro;
+// Vincula ao evento de input do HTML
+window.buscarNomeFabricante = buscarNomeFabricante;

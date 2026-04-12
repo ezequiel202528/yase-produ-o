@@ -61,7 +61,8 @@ function fecharModalEtiqueta() {
 }
 
 // 3. Função para Disparar a Impressão Real
-function executarImpressao() {
+function validarEImprimir() {
+  // Alterado para coincidir com o HTML
   const conteudo = document.getElementById("areaImpressaoEtiqueta").innerHTML;
   const janela = window.open("", "", "width=800,height=600");
 
@@ -88,4 +89,4 @@ function executarImpressao() {
 
 window.prepararModalEtiqueta = prepararModalEtiqueta;
 window.fecharModalEtiqueta = fecharModalEtiqueta;
-window.executarImpressao = executarImpressao;
+window.validarEImprimir = validarEImprimir;

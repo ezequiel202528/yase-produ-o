@@ -130,6 +130,11 @@ function fecharModalErroReteste() {
   document.getElementById("ult_reteste").focus();
 }
 
+// Garante que o modal de erro de reteste seja fechado globalmente
+window.fecharModalErroReteste = fecharModalErroReteste;
+window.validarAnoReteste = validarAnoReteste;
+window.setStatus = setStatus;
+
 // Inicialização ao carregar a página
 
 function calcularDatasAutomaticas() {
