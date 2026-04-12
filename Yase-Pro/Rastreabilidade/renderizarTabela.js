@@ -44,19 +44,16 @@ async function carregarItens() {
     const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
     if (!osAtiva) return;
 
-    // Tenta carregar com o nome do fabricante (Join)
+    // 1. Consulta metódica: Força o Join usando a FK específica 'fabricante_id'
     let { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes(nome)")
+      .select("*, fabricantes!fabricante_id(nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
-    // SEGUNDA CHANCE: Se o Join falhar (erro de relação no banco), busca apenas os dados básicos
+    // 2. Fallback de segurança (se o banco não tiver a FK configurada corretamente)
     if (error) {
-      console.warn(
-        "⚠️ Falha na relação de fabricantes. Renderizando apenas com IDs para manter estabilidade.",
-        error,
-      );
+      console.warn("⚠️ Erro no Join de fabricantes:", error.message);
       const fallback = await _supabase
         .from("itens_os")
         .select("*")
@@ -425,17 +422,20 @@ function renderItens(itens) {
         : "Sem alterações";
       const usuarioAlt = item.usuario_alteracao || "-";
 
-      // Lógica Metódica: Prioriza o Nome vindo do Join, senão usa o ID
+      // 3. Extração metódica do nome (mesma lógica do span de preview)
       let nomeExibicao = item.fabricante_id || "-";
-
-      // Verifica se o Supabase trouxe o objeto relacionado (fabricantes ou fabricante)
       const relacaoFab = item.fabricantes || item.fabricante;
+
       if (relacaoFab) {
+        // Supabase pode retornar array ou objeto dependendo da relação
         const nomeBruto = Array.isArray(relacaoFab)
           ? relacaoFab[0]?.nome
           : relacaoFab.nome;
-        if (nomeBruto) nomeExibicao = String(nomeBruto).toUpperCase();
+        if (nomeBruto) {
+          nomeExibicao = String(nomeBruto).toUpperCase();
+        }
       }
+
       return `
         <tr data-index="${index}" class="group text-[11px] border-b border-slate-800 hover:bg-slate-800/40 transition-colors whitespace-nowrap ${corDaLinha}">
           <td class="p-3 sticky left-0 z-[40] bg-[#0f172a] border-r border-slate-700 font-bold group-hover:bg-[#1e293b] transition-colors">
@@ -445,7 +445,7 @@ function renderItens(itens) {
               ${item.prefixo_selo ? item.prefixo_selo + "-" : ""}${item.selo_inmetro ?? "-"}
           </td>
           <td class="p-3 font-bold text-slate-200">${item.nr_cilindro || "S/N"}</td>
-          <td class="p-3 font-bold text-slate-300">${item.nbr || "-"}</td>
+          <td class="p-3 font-bold text-slate-300 uppercase">${item.nbr || "-"}</td>
           <td class="p-3 font-bold text-slate-300">${nomeExibicao}</td>
           <td class="p-3">${item.ano_fab || "-"}</td>
           <td class="p-3">${item.ult_reteste || "-"}</td>

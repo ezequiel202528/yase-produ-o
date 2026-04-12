@@ -78,51 +78,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Ajuste na função loadItens para garantir a ordem correta
-async function loadItens() {
-  try {
-    console.log("🔍 Buscando itens para OS:", window.currentOS);
-
-    // Verifica se o elemento da tabela existe
-    const tabelaElement = document.getElementById("itensList");
-    console.log("✅ Tabela DOM encontrada:", tabelaElement ? "SIM" : "NÃO");
-
-    let { data, error } = await _supabase
-      .from("itens_os")
-      .select("*, fabricantes(nome)")
-      .eq("os_number", window.currentOS)
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.warn("⚠️ Fallback no loadItens:", error.message);
-      const fallback = await _supabase
-        .from("itens_os")
-        .select("*")
-        .eq("os_number", window.currentOS)
-        .order("created_at", { ascending: true });
-
-      if (fallback.error) throw fallback.error;
-      data = fallback.data;
-    }
-
-    if (!data) {
-      console.error("❌ Erro Supabase:", error);
-      throw error;
-    }
-
-    console.log("✅ Dados recebidos:", data?.length || 0, "itens");
-    console.log("📊 Primeiros dados:", data?.[0] || "vazio");
-
-    // Chama renderItens com os dados
-    if (typeof window.renderItens === "function") {
-      window.renderItens(data);
-      console.log("✅ Tabela renderizada com sucesso");
-    } else {
-      console.error("❌ renderItens não está definida!");
-    }
-  } catch (error) {
-    console.error("❌ Erro ao carregar itens:", error);
-  }
-}
+// Removida a função loadItens duplicada para evitar conflitos de renderização.
+// O sistema agora utiliza exclusivamente carregarItens() de renderizarTabela.js.
 
 // Função de Logout
 function logout() {
