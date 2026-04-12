@@ -957,6 +957,9 @@ document.addEventListener("keydown", function (e) {
     if (e.target.tagName === "BUTTON" || e.target.tagName === "TEXTAREA")
       return;
 
+    // Ignora a navegação automática se o usuário estiver dentro de qualquer Modal
+    if (e.target.closest(".fixed")) return;
+
     const sequence = [
       "cod_barras",
       "X_input_id",

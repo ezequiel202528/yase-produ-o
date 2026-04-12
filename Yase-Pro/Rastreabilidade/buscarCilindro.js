@@ -60,7 +60,7 @@ function preencherCampos(item) {
   document.getElementById("ano_fab").value = item.ano_fab || "";
   document.getElementById("ult_reteste").value = item.ult_reteste || "";
   document.getElementById("tipo_carga").value = item.tipo_carga || "";
-  // Adicione os demais campos conforme sua necessidade...
+  // NOTA: Não adicionamos o X_input_id aqui para evitar que o ID do fabricante seja sobrescrito pelo cilindro
 }
 
 // Funções para Controle do Modal de Busca

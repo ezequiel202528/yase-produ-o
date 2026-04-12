@@ -149,7 +149,7 @@
          <div class="flex-1 relative flex items-center bg-slate-800 rounded-lg border border-slate-700 focus-within:ring-2 ring-indigo-500/20">
    <input type="number" id="X_input_id" 
     class="w-full h-8 pl-2 pr-2 text-[10px] bg-transparent outline-none text-white font-bold" 
-    placeholder="Fab." 
+    placeholder="Fab." autocomplete="off"
     oninput="buscarNomeFabricante(this.value)"
     onkeydown="if(event.key === 'Enter') validarFabricanteAntesDeSeguir(event)">
     
@@ -181,11 +181,6 @@
                 <div class="flex gap-1">
                     <select id="tipo_carga" class="flex-1 h-8 text-[10px] border rounded-lg px-1" onchange="definirNivelPeloReteste()">
                         <option value="">Tipo</option>
-                        <option value="PQS-ABC">PQS - ABC</option>
-                        <option value="PQS-BC">PQS - BC</option>
-                        <option value="CO2">CO2</option>
-                        <option value="AGUA">Água</option>
-                        <option value="ESPUMA">Espuma Mec</option>
                     </select>
                     <button onclick="X_ABRIR_TIPO()" class="w-8 h-8 shrink-0 bg-slate-800 border border-slate-700 rounded-lg flex items-center justify-center text-slate-400 hover:text-amber-500 transition-colors">
                         <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
@@ -579,7 +574,7 @@
 
             <div class="relative mb-6">
                 <input type="text" id="inputBuscaModal" 
-                    class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 px-5 text-white text-lg font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 px-5 text-white text-lg font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-600" autocomplete="off"
                     placeholder="Nº do Cilindro..."
                     onkeyup="if(event.key === 'Enter') executarBuscaModal()">
             </div>
