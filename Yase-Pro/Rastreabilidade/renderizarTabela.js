@@ -709,10 +709,12 @@ async function registrarItem() {
 
   try {
     // 2. BUSCA O SELO REAL NO BANCO (O GATILHO DO FLASH)
-    // Adicionada verificação de existência da função para evitar crash
-    if (typeof sincronizarPainelSelos === "function") {
-      await sincronizarPainelSelos();
-    } else if (!window.proximoSeloCalculado && !window.editandoID) {
+    if (typeof window.sincronizarPainelSelos === "function") {
+      await window.sincronizarPainelSelos();
+    }
+
+    // Validação de segurança para novo registro
+    if (!window.proximoSeloCalculado && !window.editandoID) {
       alert("⚠️ Sistema de controle de selos não inicializado.");
       return;
     }
@@ -827,20 +829,20 @@ async function registrarItem() {
 
     if (resultado.error) throw resultado.error;
 
-    // 6. SUCESSO - O FLASH DE LUZ ESTÁ AQUI
+    // 6. SUCESSO
     console.log("Item salvo! Selo:", seloNumParaGravar);
 
     await carregarItens();
     focarUltimoRegistro();
     limparCamposAposRegistro();
 
-    // ✅ CHAMADA CRÍTICA: Atualiza o contador de 995 para 994 (ou vice-versa)
-    if (typeof sincronizarPainelSelos === "function") {
-      await sincronizarPainelSelos();
+    if (typeof window.sincronizarPainelSelos === "function") {
+      await window.sincronizarPainelSelos();
     }
 
-    // Se houver função de resetar botão de edição
-    if (typeof resetarBotaoRegistro === "function") resetarBotaoRegistro();
+    if (typeof window.resetarBotaoRegistro === "function") {
+      window.resetarBotaoRegistro();
+    }
   } catch (err) {
     console.error("Erro no salvamento:", err);
     alert("Erro ao salvar: " + (err.message || "Erro desconhecido."));

@@ -4,9 +4,10 @@
  */
 
 // Garante acesso ao cliente Supabase global
-const _supabase = window._supabase;
+const getSupa = () => window._supabase || window.supabase;
 
 // async function sincronizarPainelSelos() {
+const _supabase = getSupa();
 //     const elLote = document.getElementById('lote_documento');
 //     const elSeloProx = document.getElementById('proximo_selo_num');
 //     const elQtd = document.getElementById('qtd_restante_texto');

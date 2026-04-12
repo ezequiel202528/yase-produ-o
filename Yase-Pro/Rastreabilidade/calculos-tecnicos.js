@@ -306,6 +306,8 @@ function atualizarBadgeComponentes() {
     }
   }
 }
+
+// Exportação Global para o HTML (onclick/oninput)
 window.setStatus = setStatus;
 window.selecionarStatusManual = selecionarStatusManual;
 window.validarAnoReteste = validarAnoReteste;
