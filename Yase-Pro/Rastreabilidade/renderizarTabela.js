@@ -47,7 +47,7 @@ async function carregarItens() {
     // Tenta carregar com o nome do fabricante (Join)
     let { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes (nome)")
+      .select("*, fabricantes(nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
@@ -426,9 +426,14 @@ function renderItens(itens) {
       const usuarioAlt = item.usuario_alteracao || "-";
 
       // Extrai o nome do fabricante (mesmo dado que o span de preview recebe)
-      let nomeFab = Array.isArray(item.fabricantes)
-        ? item.fabricantes[0]?.nome
-        : item.fabricantes?.nome;
+      // Tenta plural, singular ou primeiro item de um array
+      let nomeFabRaw = item.fabricantes?.nome || item.fabricante?.nome;
+
+      if (!nomeFabRaw && Array.isArray(item.fabricantes)) {
+        nomeFabRaw = item.fabricantes[0]?.nome;
+      }
+
+      let nomeFab = nomeFabRaw ? String(nomeFabRaw).toUpperCase() : null;
 
       if (nomeFab) nomeFab = nomeFab.toUpperCase();
 
