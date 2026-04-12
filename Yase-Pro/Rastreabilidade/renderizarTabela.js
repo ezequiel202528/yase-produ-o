@@ -34,7 +34,6 @@ async function carregarItens() {
 }
 
 /**
-/**
  * Formata datas no padrão brasileiro para exibição na tabela.
  */
 function fixData(v) {
@@ -50,7 +49,7 @@ function fixData(v) {
 /**
  * Move o foco da visualização para o último item registrado na tabela.
  */
-const focarUltimoRegistro = () => {
+function focarUltimoRegistro() {
   const tabelaBody = document.getElementById("itensList");
   if (!tabelaBody) return;
 
@@ -71,7 +70,7 @@ const focarUltimoRegistro = () => {
 
     ultimaLinha.classList.add("border-l-4", "border-blue-500");
   }
-};
+}
 
 /**
  * Gera o HTML dinâmico das linhas da tabela com base no array de itens fornecido.
