@@ -46,7 +46,7 @@ async function carregarItens() {
 
     const { data, error } = await _supabase
       .from("itens_os")
-      .select("*")
+      .select("*, fabricantes(nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
@@ -420,7 +420,7 @@ function renderItens(itens) {
           </td>
           <td class="p-3 font-bold text-slate-200">${item.nr_cilindro || "S/N"}</td>
           <td class="p-3">${item.nbr || "-"}</td>
-          <td class="p-3">${item.fabricante_id || "-"}</td>
+          <td class="p-3">${item.fabricantes?.nome || item.fabricante_id || "-"}</td>
           <td class="p-3">${item.ano_fab || "-"}</td>
           <td class="p-3">${item.ult_reteste || "-"}</td>
           <td class="px-4 py-3 text-xs font-bold text-orange-500">${item.prox_reteste || "-"}</td>
