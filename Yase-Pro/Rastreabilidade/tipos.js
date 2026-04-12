@@ -113,7 +113,10 @@ window.abrirModalTipo = () => {
   carregarTipos();
 };
 window.fecharModalTipo = () =>
-  document.getElementById("modalTipo")?.classList.add("hidden");
+  document.getElementById("modalTipo")?.classList.add("hidden") ||
+  document.getElementById("modalTipo")?.classList.remove("flex");
+
+window.carregarTipos = carregarTipos;
 window.salvarTipo = salvarTipo;
 window.selecionarTipo = selecionarTipo;
 window.prepararEdicaoTipo = prepararEdicaoTipo;
