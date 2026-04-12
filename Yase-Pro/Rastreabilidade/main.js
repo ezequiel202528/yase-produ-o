@@ -42,25 +42,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (campoData) campoData.value = hoje;
 
   // --- CARREGAMENTO INICIAL ---
-  // Limpeza agressiva contra Autofill (0013 bug)
+  // Limpeza preventiva contra Autofill (0013 bug)
   const forcarLimpeza = () => {
     const ids = ["X_input_id", "nr_cilindro", "inputBuscaModal"];
     ids.forEach((id) => {
       const el = document.getElementById(id);
       if (el) {
         el.value = "";
-        el.setAttribute("value", ""); // Limpa o atributo HTML também
+        el.defaultValue = "";
       }
     });
     const preview = document.getElementById("nome_fabricante_preview");
     if (preview) preview.innerText = "";
   };
 
-  // Executa a limpeza em múltiplos intervalos para garantir que o Chrome não preencha depois
+  // Executa a limpeza imediata
   forcarLimpeza();
-  setTimeout(forcarLimpeza, 100);
   setTimeout(forcarLimpeza, 500);
-  setTimeout(forcarLimpeza, 2000);
+  setTimeout(forcarLimpeza, 1500);
 
   console.log("📥 Carregando itens do Supabase...");
   if (typeof window.carregarItens === "function") await window.carregarItens();
