@@ -1,10 +1,12 @@
 /**
- * GERENCIAMENTO DE TIPOS DE CARGA - YA SE PRO
+ * Gerenciamento de Tipos de Carga do sistema.
  */
-
 const getSupa = () => window._supabase || window.supabase;
 window.editandoTipoId = null;
 
+/**
+ * Carrega os tipos de carga cadastrados no Supabase.
+ */
 async function carregarTipos() {
   try {
     const { data, error } = await getSupa()
@@ -20,6 +22,9 @@ async function carregarTipos() {
   }
 }
 
+/**
+ * Renderiza a lista de tipos de carga no modal.
+ */
 function renderizarListaTipo(lista) {
   const container = document.getElementById("listaTipos");
   if (!container) return;
@@ -45,6 +50,9 @@ function renderizarListaTipo(lista) {
     .join("");
 }
 
+/**
+ * Atualiza o elemento select de tipos de carga no formulário principal.
+ */
 function atualizarSelectTipo(lista) {
   const select = document.getElementById("tipo_carga");
   if (!select) return;
@@ -55,16 +63,21 @@ function atualizarSelectTipo(lista) {
   select.value = valorAtual;
 }
 
+/**
+ * Seleciona um tipo de carga e fecha o modal.
+ */
 function selecionarTipo(nome) {
   const select = document.getElementById("tipo_carga");
   if (select) {
     select.value = nome;
-    // Dispara o evento de mudança para atualizar os títulos de pesagem
     select.dispatchEvent(new Event("change"));
   }
   fecharModalTipo();
 }
 
+/**
+ * Salva (insere ou atualiza) um tipo de carga no banco de dados.
+ */
 async function salvarTipo() {
   const input = document.getElementById("novoTipoNome");
   const nome = input.value.toUpperCase().trim();
@@ -91,6 +104,9 @@ async function salvarTipo() {
   }
 }
 
+/**
+ * Prepara o formulário do modal para editar um tipo de carga existente.
+ */
 function prepararEdicaoTipo(id, nome) {
   window.editandoTipoId = id;
   const input = document.getElementById("novoTipoNome");
@@ -99,6 +115,9 @@ function prepararEdicaoTipo(id, nome) {
   document.getElementById("btnSalvarTipo").innerText = "SALVAR";
 }
 
+/**
+ * Exclui um tipo de carga do banco de dados após confirmação.
+ */
 async function deletarTipo(id) {
   if (confirm("Deseja realmente excluir este tipo de carga?")) {
     const { error } = await getSupa().from("tipos_carga").delete().eq("id", id);

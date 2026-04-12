@@ -1,4 +1,3 @@
-// Garante acesso ao cliente Supabase global
 const getSupabase = () =>
   window._supabase ||
   window.supabase.createClient(
@@ -6,10 +5,13 @@ const getSupabase = () =>
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s",
   );
 
+/**
+ * Busca informações técnicas de um cilindro no banco de dados.
+ */
 async function buscarCilindro() {
   const _supabase = getSupabase();
   const nrCilindro = document.getElementById("nr_cilindro").value.trim();
-  const osAtual = document.getElementById("osBadgeNumber").innerText; // Pega o número da OS carregada
+  const osAtual = document.getElementById("osBadgeNumber").innerText;
 
   if (!nrCilindro) {
     alert("Por favor, digite o número do cilindro.");
@@ -18,7 +20,7 @@ async function buscarCilindro() {
 
   try {
     // 1. Tenta buscar na OS Atual primeiro para evitar duplicidade ou permitir edição
-    const { data: itemLocal, error: errorLocal } = await _supabase
+    const { data: itemLocal } = await _supabase
       .from("itens_rastreio") // Nome da sua tabela no Supabase
       .select("*")
       .eq("nr_cilindro", nrCilindro)
@@ -32,7 +34,7 @@ async function buscarCilindro() {
     }
 
     // 2. Se não achou na atual, busca em todo o histórico (Global)
-    const { data: itemGlobal, error: errorGlobal } = await _supabase
+    const { data: itemGlobal } = await _supabase
       .from("itens_rastreio")
       .select("os_vinculada, data_lancamento")
       .eq("nr_cilindro", nrCilindro)
@@ -44,7 +46,6 @@ async function buscarCilindro() {
       alert(
         `Cilindro encontrado na OS: ${itemGlobal.os_vinculada}\nData do último registro: ${new Date(itemGlobal.data_lancamento).toLocaleDateString()}`,
       );
-      // Opcional: Redirecionar ou perguntar se deseja importar os dados técnicos
     } else {
       alert("Cilindro não encontrado em nenhuma Ordem de Serviço.");
     }
@@ -54,16 +55,19 @@ async function buscarCilindro() {
   }
 }
 
-// Função auxiliar para popular o formulário se achar na OS atual
+/**
+ * Preenche os campos do formulário com dados de um cilindro encontrado.
+ */
 function preencherCampos(item) {
   document.getElementById("cod_barras").value = item.cod_barras || "";
   document.getElementById("ano_fab").value = item.ano_fab || "";
   document.getElementById("ult_reteste").value = item.ult_reteste || "";
   document.getElementById("tipo_carga").value = item.tipo_carga || "";
-  // NOTA: Não adicionamos o X_input_id aqui para evitar que o ID do fabricante seja sobrescrito pelo cilindro
 }
 
-// Funções para Controle do Modal de Busca
+/**
+ * Abre o modal de busca de cilindros.
+ */
 function abrirModalBusca() {
   const modal = document.getElementById("modalBuscaCilindro");
   if (modal) {
@@ -75,6 +79,9 @@ function abrirModalBusca() {
   }
 }
 
+/**
+ * Fecha o modal de busca de cilindros.
+ */
 function fecharModalBusca() {
   const modal = document.getElementById("modalBuscaCilindro");
   if (modal) {
@@ -84,6 +91,9 @@ function fecharModalBusca() {
   }
 }
 
+/**
+ * Executa a busca de um cilindro dentro do modal e destaca na tabela caso pertença à OS atual.
+ */
 async function executarBuscaModal() {
   const _supabase = getSupabase();
   const nrCilindroBusca = document
@@ -107,32 +117,25 @@ async function executarBuscaModal() {
       fecharModalBusca();
 
       if (String(item.os_number) === String(osAtual)) {
-        // 1. Localiza a linha na tabela
         const tbody = document.getElementById("itensList");
         const linhas = tbody.querySelectorAll("tr");
         let linhaParaDestacar = null;
 
         linhas.forEach((linha) => {
-          // Procura o número do cilindro no texto da linha
           if (linha.innerText.includes(nrCilindroBusca)) {
             linhaParaDestacar = linha;
           }
         });
 
         if (linhaParaDestacar) {
-          // 2. Limpa qualquer destaque anterior antes de aplicar o novo
           document.querySelectorAll(".row-highlight-active").forEach((el) => {
             el.classList.remove("row-highlight-active");
           });
-
-          // 3. Rola e destaca
           linhaParaDestacar.scrollIntoView({
             behavior: "smooth",
             block: "center",
           });
           linhaParaDestacar.classList.add("row-highlight-active");
-
-          // 4. LÓGICA DE REMOÇÃO: Remove ao clicar fora
           const removerAoClicarFora = (e) => {
             // Se o clique não foi na própria linha, remove o destaque
             if (!linhaParaDestacar.contains(e.target)) {
@@ -141,7 +144,6 @@ async function executarBuscaModal() {
             }
           };
 
-          // Ativa o ouvinte com um pequeno atraso
           setTimeout(() => {
             document.addEventListener("click", removerAoClicarFora);
           }, 200);
@@ -162,33 +164,25 @@ async function executarBuscaModal() {
   }
 }
 
+/**
+ * Renderiza os resultados da busca e aplica efeitos visuais na tabela.
+ */
 function exibirResultadosBusca(resultados, osAtual) {
   if (resultados && resultados.length > 0) {
     const item = resultados[0];
 
-    // Verifica se pertence à OS que você está trabalhando
     if (String(item.os_number) === String(osAtual)) {
       fecharModalBusca();
-
-      // Tenta encontrar a linha na tabela pelo número do cilindro
-      // Nota: Isso depende de você ter o nr_cilindro em algum lugar da linha ou um ID nela
       const todasAsLinhas = document.querySelectorAll("tr");
       let linhaEncontrada = null;
-
       todasAsLinhas.forEach((linha) => {
         if (linha.innerText.includes(item.nr_cilindro)) {
           linhaEncontrada = linha;
         }
       });
-
       if (linhaEncontrada) {
-        // 1. Faz a tela rolar suavemente até o item
         linhaEncontrada.scrollIntoView({ behavior: "smooth", block: "center" });
-
-        // 2. Aplica o efeito visual
         linhaEncontrada.classList.add("row-highlight");
-
-        // 3. Remove a classe depois de 3 segundos para poder repetir o efeito depois
         setTimeout(() => {
           linhaEncontrada.classList.remove("row-highlight");
         }, 3000);

@@ -1,6 +1,8 @@
-// Função auxiliar para obter o Supabase com segurança
 const getSupa = () => window._supabase || window.supabase;
 
+/**
+ * Renderiza a lista de fabricantes no container HTML do modal.
+ */
 function renderizarListaFabricantes(lista) {
   const container = document.getElementById("listaFabricantes");
   if (!container) return;
@@ -35,24 +37,17 @@ async function carregarFabricantes() {
   }
 }
 
+/**
+ * Seleciona um fabricante da lista e preenche o formulário de rastreio.
+ */
 function selecionarFabricante(id, nome) {
-  // 1. Encontra o input de ID do fabricante
   const inputFabId = document.getElementById("X_input_id");
 
   if (inputFabId) {
-    // 2. Coloca o ID do fabricante clicado dentro do input
     inputFabId.value = id;
-
-    // 3. Atualiza a variável global para que o 'registrarItem' saiba que é válido
     window.fabricanteValido = true;
-
-    // 4. Dispara a função de busca para atualizar o preview do nome ao lado do input
-    // Isso garante que o nome apareça imediatamente sem precisar digitar
     buscarNomeFabricante(id);
-
-    // 5. Opcional: Remove qualquer marcação de erro se existir
     inputFabId.classList.remove("input-error-shake", "border-red-500");
-
     console.log(`Fabricante selecionado: ${nome} (ID: ${id})`);
   }
 
@@ -61,6 +56,7 @@ function selecionarFabricante(id, nome) {
     "ring-2",
     "ring-emerald-500/20",
   );
+
   setTimeout(
     () =>
       inputFabId.classList.remove(
@@ -71,11 +67,12 @@ function selecionarFabricante(id, nome) {
     1000,
   );
 
-  // 6. Fecha o modal automaticamente após a seleção
   fecharModalFabricante();
 }
 
-// 3. Cadastro com atualização em tempo real
+/**
+ * Cadastra um novo fabricante no banco de dados e atualiza a lista.
+ */
 async function cadastrarFabricante() {
   const nomeInput = document.getElementById("novoFabricanteNome");
   if (!nomeInput) return;
@@ -92,13 +89,15 @@ async function cadastrarFabricante() {
 
   if (!error) {
     nomeInput.value = "";
-    carregarFabricantes(); // Atualiza a lista no modal na hora para mostrar o novo ID
+    carregarFabricantes();
   } else {
     console.error("Erro ao cadastrar:", error.message);
   }
 }
 
-// Funções de Interface
+/**
+ * Abre o modal de fabricantes.
+ */
 function abrirModalFabricante() {
   const modal = document.getElementById("modalFabricante");
   if (modal) {
@@ -108,6 +107,9 @@ function abrirModalFabricante() {
   }
 }
 
+/**
+ * Fecha o modal de fabricantes.
+ */
 function fecharModalFabricante() {
   const modal = document.getElementById("modalFabricante");
   if (modal) {
@@ -116,31 +118,32 @@ function fecharModalFabricante() {
   }
 }
 
+/**
+ * Filtra a lista de fabricantes exibida no modal com base no texto digitado.
+ */
 function filtrarFabricantes() {
-  // Pega o termo digitado e transforma em minúsculo
   const termo = document.getElementById("filtroFabricante").value.toLowerCase();
   const lista = document.getElementById("listaFabricantes");
-  const itens = lista.getElementsByTagName("div"); // Pega todos os cards de fabricante
+  const itens = lista.getElementsByTagName("div");
 
-  // Percorre a lista e esconde o que não combina
   for (let i = 0; i < itens.length; i++) {
     const nomeFabricante = itens[i].innerText.toLowerCase();
-
     if (nomeFabricante.includes(termo)) {
-      itens[i].style.display = "flex"; // Mostra
+      itens[i].style.display = "flex";
     } else {
-      itens[i].style.display = "none"; // Esconde
+      itens[i].style.display = "none";
     }
   }
 }
 
-// Variável global para controle de validação
 window.fabricanteValido = false;
 
+/**
+ * Busca o nome do fabricante pelo ID para exibição no preview do formulário.
+ */
 async function buscarNomeFabricante(id) {
   const display = document.getElementById("nome_fabricante_preview");
-  window.fabricanteValido = false; // Reseta a cada digitação
-
+  window.fabricanteValido = false;
   if (!id) {
     display.innerText = "";
     return;
@@ -157,12 +160,12 @@ async function buscarNomeFabricante(id) {
       const primeiroNome = data.nome.split(" ")[0];
       display.innerText = primeiroNome.substring(0, 10);
       display.classList.remove("text-red-500");
-      display.classList.add("text-emerald-500"); // Fica verde se achar
+      display.classList.add("text-emerald-500");
       window.fabricanteValido = true;
     } else {
       display.innerText = "NÃO ENCONTRADO";
       display.classList.remove("text-emerald-500");
-      display.classList.add("text-red-500"); // Vermelho se não existir
+      display.classList.add("text-red-500");
       window.fabricanteValido = false;
     }
   } catch (err) {
@@ -171,11 +174,13 @@ async function buscarNomeFabricante(id) {
   }
 }
 
+/**
+ * Verifica se o fabricante é válido antes de permitir o registro do item.
+ */
 function validarFabricanteAntesDeSeguir(event) {
   if (!window.fabricanteValido) {
-    event.preventDefault(); // Impede o envio do formulário/registro
+    event.preventDefault();
 
-    // Alerta moderno usando a estrutura de cores do seu sistema
     const msg = document.createElement("div");
     msg.innerHTML = `
             <div id="alert-fabricante" class="fixed top-10 left-1/2 -translate-x-1/2 z-[9999] bg-slate-900 border-l-4 border-red-500 p-4 rounded shadow-2xl animate-bounce">
@@ -187,7 +192,6 @@ function validarFabricanteAntesDeSeguir(event) {
         `;
     document.body.appendChild(msg);
 
-    // Remove o alerta após 3 segundos
     setTimeout(() => {
       const alert = document.getElementById("alert-fabricante");
       if (alert) alert.remove();
@@ -197,16 +201,16 @@ function validarFabricanteAntesDeSeguir(event) {
   }
 }
 
+/**
+ * Exibe um alerta de erro estilizado na tela.
+ */
 function exibirAlertaErro(mensagem) {
-  // Remove se já houver um alerta na tela para não acumular
   const alertaAntigo = document.getElementById("yase-alert-premium");
   if (alertaAntigo) alertaAntigo.remove();
 
-  // Cria o container do Modal/Toast
   const modal = document.createElement("div");
   modal.id = "yase-alert-premium";
 
-  // Estilização Premium (Tailwind)
   modal.className = `
         fixed top-8 left-1/2 -translate-x-1/2 z-[10000] 
         flex items-center gap-4 px-6 py-4
@@ -231,7 +235,6 @@ function exibirAlertaErro(mensagem) {
 
   document.body.appendChild(modal);
 
-  // Remove automaticamente após 4 segundos com animação de saída
   setTimeout(() => {
     if (modal) {
       modal.classList.add(

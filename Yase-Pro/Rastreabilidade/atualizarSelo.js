@@ -1,85 +1,18 @@
 /**
- * RASTREABILIDADE - YA SE PRO
  * Sincronização do Contador de Selos em Tempo Real
  */
-
-// Garante acesso ao cliente Supabase global
 const getSupa = () => window._supabase || window.supabase;
-
-// async function sincronizarPainelSelos() {
 const _supabase = getSupa();
-//     const elLote = document.getElementById('lote_documento');
-//     const elSeloProx = document.getElementById('proximo_selo_num');
-//     const elQtd = document.getElementById('qtd_restante_texto');
-//     const barra = document.getElementById('barra_progresso_selo');
 
-//     try {
-//         // 1. Busca o lote aberto no Supabase
-//         const { data: lote, error: erroLote } = await _supabase
-//             .from('rem_essas')
-//             .select('*')
-//             .eq('status_lote', 'ABERTO')
-//             .maybeSingle();
-
-//         if (erroLote || !lote) {
-//             exibirDadosVazios();
-//             return;
-//         }
-
-//         // 2. Busca os selos já usados para este prefixo
-//         const { data: itens, error: erroItens } = await _supabase
-//             .from('itens_os')
-//             .select('selo_inmetro') // Nome correto da coluna no seu banco
-//             .eq('prefixo_selo', lote.prefixo);
-
-//         if (erroItens) throw erroItens;
-
-//         // 3. Processamento dos números
-//         const selosUsados = new Set(itens.map(i => parseInt(i.selo_inmetro)).filter(n => !isNaN(n)));
-//         const seloInicial = parseInt(lote.selo_inicio);
-//         const qtdTotalLote = parseInt(lote.qtd_selos);
-
-//         // Acha o próximo número vago na sequência
-//         let proximo = seloInicial;
-//         while (selosUsados.has(proximo)) {
-//             proximo++;
-//         }
-
-//         // Cálculo da quantidade real restante
-//         const realRestante = qtdTotalLote - selosUsados.size;
-
-//         // 4. ATUALIZAÇÃO DO HTML (Onde o "flash" acontece)
-//         if (elLote) elLote.innerHTML = `LOTE: <span class="text-amber-500 font-black">${lote.prefixo}</span>`;
-//         if (elSeloProx) elSeloProx.innerText = proximo;
-
-//         if (elQtd) {
-//             elQtd.innerText = realRestante; // Atualiza o 995
-//         }
-
-//         // 5. Atualiza a barra de progresso
-//         if (barra) {
-//             const porcentagem = (realRestante / qtdTotalLote) * 100;
-//             barra.style.width = `${porcentagem}%`;
-//         }
-
-//         // Guarda em memória global para o registrarItem usar
-//         window.prefixoAtualSelo = lote.prefixo;
-//         window.proximoSeloCalculado = proximo;
-
-//         // Chama o bloqueio se acabar
-//         if (typeof aplicarBloqueioSistema === "function") {
-//             aplicarBloqueioSistema(realRestante);
-//         }
-
-//     } catch (err) {
-//         console.error("Erro na sincronização do painel:", err);
-//     }
-// }
-
+/**
+ * Consulta o banco de dados para encontrar o lote de selos aberto e o próximo número disponível.
+ * Atualiza o painel visual de selos na interface.
+ */
 async function sincronizarPainelSelos() {
   const elLote = document.getElementById("lote_documento");
   const elSeloProx = document.getElementById("proximo_selo_num");
   const elQtd = document.getElementById("qtd_restante_texto");
+  const barra = document.getElementById("barra_progresso_selo");
 
   try {
     // 1. Procura o lote aberto
@@ -94,7 +27,6 @@ async function sincronizarPainelSelos() {
       return;
     }
 
-    // 2. Busca os selos usados (IMPORTANTE: selo_inmetro)
     const { data: itens, error: erroItens } = await _supabase
       .from("itens_os")
       .select("selo_inmetro")
@@ -102,31 +34,28 @@ async function sincronizarPainelSelos() {
 
     if (erroItens) throw erroItens;
 
-    // 3. Filtra e organiza os números
     const selosUsados = new Set(
       itens.map((i) => parseInt(i.selo_inmetro)).filter((n) => !isNaN(n)),
     );
     const seloInicial = parseInt(lote.selo_inicio);
     const qtdTotal = parseInt(lote.qtd_selos);
 
-    // 4. Acha o próximo vago (Recupera excluídos)
     let proximo = seloInicial;
     while (selosUsados.has(proximo)) {
       proximo++;
     }
 
     const restante = qtdTotal - selosUsados.size;
-
-    // 5. ATUALIZA A TELA (O Flash)
     if (elLote)
       elLote.innerHTML = `LOTE: <span class="text-amber-500 font-black">${lote.prefixo}</span>`;
     if (elSeloProx) elSeloProx.innerText = proximo;
     if (elQtd) elQtd.innerText = restante;
-
-    // Guarda globalmente para o registrarItem.js
+    if (barra) {
+      const porcentagem = (restante / qtdTotal) * 100;
+      barra.style.width = `${porcentagem}%`;
+    }
     window.proximoSeloCalculado = proximo;
     window.prefixoAtualSelo = lote.prefixo;
-
     if (typeof aplicarBloqueioSistema === "function")
       aplicarBloqueioSistema(restante);
   } catch (err) {
@@ -141,23 +70,22 @@ function exibirDadosVazios() {
   if (elQtd) elQtd.innerText = "0";
 }
 
-// Inicia ao carregar a página
 document.addEventListener("DOMContentLoaded", sincronizarPainelSelos);
 
-// atualizarSelo.js - FUNÇÃO COMPLETA
+/**
+ * Bloqueia ou libera as funcionalidades do sistema caso não haja selos disponíveis.
+ */
 function aplicarBloqueioSistema(quantidade) {
   const isBloqueado = quantidade <= 0;
-
   const barra = document.getElementById("barra_progresso_selo");
-  const totalLote = 100; // Substitua pelo valor real vindo do seu banco/lote
+  const totalLote = 100;
   const porcentagem = Math.min((quantidade / totalLote) * 100, 100);
 
   if (barra) {
     barra.style.width = `${porcentagem}%`;
-
-    // Opcional: Mudar a cor se estiver acabando
     if (porcentagem < 10) {
       barra.classList.replace("bg-amber-500", "bg-red-500");
+      barra.classList.replace("bg-indigo-600", "bg-red-500");
     } else {
       barra.classList.replace("bg-red-500", "bg-amber-500");
     }
@@ -171,7 +99,6 @@ function aplicarBloqueioSistema(quantidade) {
   const badgeSelo = document.getElementById("qtd_restante_texto");
 
   if (isBloqueado) {
-    // ESTADO BLOQUEADO
     if (btnRegistrar) {
       btnRegistrar.disabled = true;
       btnRegistrar.innerHTML =
@@ -186,7 +113,6 @@ function aplicarBloqueioSistema(quantidade) {
     });
 
     if (badgeSelo) {
-      // Muda a cor do contador para vermelho indicando erro
       badgeSelo.parentElement.classList.replace(
         "bg-amber-500/10",
         "bg-red-500/10",
@@ -194,7 +120,6 @@ function aplicarBloqueioSistema(quantidade) {
       badgeSelo.classList.replace("text-amber-500", "text-red-600");
     }
   } else {
-    // ESTADO LIBERADO
     if (btnRegistrar) {
       btnRegistrar.disabled = false;
       btnRegistrar.innerHTML =
@@ -219,6 +144,9 @@ function aplicarBloqueioSistema(quantidade) {
 // Inicializa
 document.addEventListener("DOMContentLoaded", sincronizarPainelSelos);
 
+/**
+ * Verifica a disponibilidade de selos em tempo real diretamente no banco.
+ */
 async function verificarDisponibilidadeSeloRealtime() {
   try {
     const { data: lote, error: erroLote } = await _supabase
@@ -232,22 +160,19 @@ async function verificarDisponibilidadeSeloRealtime() {
 
     const { data: itens, error: erroItens } = await _supabase
       .from("itens_os")
-      .select("selo_inmetro") // Certifique-se de que o nome da coluna no banco é este
+      .select("selo_inmetro")
       .eq("prefixo_selo", lote.prefixo);
 
     if (erroItens) throw erroItens;
 
-    // ✅ O SEGREDO: Converter tudo para número e remover nulos
     const selosUsados = itens
       .map((i) => parseInt(i.selo_inmetro))
       .filter((n) => !isNaN(n));
 
     const seloInicial = parseInt(lote.selo_inicio);
     const seloFinal = seloInicial + parseInt(lote.qtd_selos) - 1;
-
     let seloCerto = seloInicial;
 
-    // Agora o includes vai funcionar porque ambos são Números
     while (selosUsados.includes(seloCerto)) {
       seloCerto++;
     }

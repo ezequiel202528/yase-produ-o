@@ -1,58 +1,47 @@
-// Variável global para memorizar o status selecionado nos botões
 let statusSelecionadoManual = "APROVADO";
 
 /**
- * Função chamada pelos botões NOVO, APR e REP no HTML
+ * Define o status do serviço (Aprovado/Reprovado/Novo) e atualiza o feedback visual.
  */
 function setStatus(status, element) {
-  // Atualiza a variável global
   statusSelecionadoManual = status.toUpperCase();
 
-  // Atualiza o input hidden (caso você use ele no envio do formulário)
   const inputHidden = document.getElementById("resultado_valor");
   if (inputHidden) inputHidden.value = statusSelecionadoManual;
 
-  console.log("Status definido para:", statusSelecionadoManual);
-
-  // --- FEEDBACK VISUAL ---
-  // Captura os botões irmãos (os 3 botões de status)
   const botoes = element.parentElement.querySelectorAll(
     'div[onclick^="setStatus"]',
   );
 
   botoes.forEach((btn) => {
-    // Remove o destaque de todos e volta para a opacidade baixa
     btn.classList.remove("opacity-100", "border-2");
     btn.classList.add("opacity-40");
   });
 
-  // Aplica o destaque apenas no botão que foi clicado
   element.classList.remove("opacity-40");
   element.classList.add("opacity-100", "border-2");
 }
 
+/**
+ * Define o status manualmente sem feedback visual direto no elemento (uso interno).
+ */
 function selecionarStatusManual(status) {
   statusSelecionadoManual = status.toUpperCase();
-  console.log(
-    "Status definido para o próximo registro:",
-    statusSelecionadoManual,
-  );
-
-  // Feedback visual opcional: destaca o botão clicado
   document.querySelectorAll(".btn-status-selector").forEach((btn) => {
     btn.classList.remove("ring-2", "ring-white", "border-white");
   });
-  // Você pode adicionar uma classe de destaque se seus botões tiverem essa classe
 }
 
-// Seleciona o campo de entrada do ano de reteste
 const inputUltimoReteste = document.getElementById("ult_reteste");
-
-// Seleciona o container ou os inputs da seção de Teste Hidrostático (moldura vermelha)
 const camposHidrostaticos = document.querySelectorAll(
   ".ensaios-group-red input",
 );
 
+/**
+ * Monitora a digitação do ano de último reteste.
+ * Bloqueia ou libera os campos de Ensaio Hidrostático conforme a necessidade
+ * (Manutenção de 2º ou 3º nível).
+ */
 inputUltimoReteste.addEventListener("input", function () {
   const anoInformado = parseInt(this.value);
   const anoAtual = new Date().getFullYear(); // 2026
@@ -62,27 +51,20 @@ inputUltimoReteste.addEventListener("input", function () {
   // O Teste Hidrostático (Nível 3) só é permitido se a diferença for >= 5 ou se for o ano atual.
   if (this.value.length === 4) {
     if (diferencaAnos > 0 && diferencaAnos < 5) {
-      // BLOQUEIA DIGITAÇÃO (É Nível 2)
       camposHidrostaticos.forEach((input) => {
         input.disabled = true;
         input.style.backgroundColor = "#1a1a1a";
         input.style.cursor = "not-allowed";
-        input.value = ""; // Limpa os valores para evitar envio de dados incorretos
+        input.value = "";
       });
-
-      // Ajusta a opacidade do grupo visualmente
       const grupoHidro = document.querySelector(".ensaios-group-red");
       if (grupoHidro) grupoHidro.style.opacity = "0.4";
-
-      console.log("Manutenção de 2º Nível: Campos Hidrostáticos bloqueados.");
     } else {
-      // LIBERA DIGITAÇÃO (Nível 3 detectado ou ano inválido/futuro que será validado depois)
       camposHidrostaticos.forEach((input) => {
         input.disabled = false;
         input.style.backgroundColor = "transparent";
         input.style.cursor = "text";
       });
-
       const grupoHidro = document.querySelector(".ensaios-group-red");
       if (grupoHidro) grupoHidro.style.opacity = "1";
     }
@@ -90,10 +72,13 @@ inputUltimoReteste.addEventListener("input", function () {
 });
 
 /**
- * Valida o reteste e exibe o modal customizado em caso de erro
+ * Valida se o ano de reteste informado é válido para manutenção.
+ * Exibe um modal de erro caso o extintor esteja condenado ou com data incompatível.
  */
 function validarAnoReteste() {
   const campoReteste = document.getElementById("ult_reteste");
+  if (!campoReteste) return true;
+
   const valorInformado = parseInt(campoReteste.value);
   const anoAtual = new Date().getFullYear(); // 2026
   const limiteMinimo = anoAtual - 5; // 2021
@@ -101,30 +86,24 @@ function validarAnoReteste() {
   if (!valorInformado || campoReteste.value.length !== 4) return true;
 
   if (valorInformado < limiteMinimo) {
-    // Preenche os dados no modal
     document.getElementById("anoInvalidoDestaque").innerText = valorInformado;
     document.getElementById("anoMinimoDestaque").innerText = limiteMinimo;
-
-    // Exibe o modal com flex
     const modal = document.getElementById("modalErroReteste");
     modal.classList.remove("hidden");
     modal.classList.add("flex");
-
-    // Destaque visual no input
     campoReteste.classList.add("border-red-500", "bg-red-500/5");
     return false;
   }
-
   campoReteste.classList.remove("border-red-500", "bg-red-500/5");
   return true;
 }
 
 /**
- * Fecha o modal de erro
+ * Fecha o modal de erro de ano de reteste.
  */
 function fecharModalErroReteste() {
   const modal = document.getElementById("modalErroReteste");
-  modal.classList.add("hidden");
+  if (modal) modal.classList.add("hidden");
   modal.classList.remove("flex");
 
   document.getElementById("ult_reteste").focus();
@@ -135,18 +114,20 @@ window.fecharModalErroReteste = fecharModalErroReteste;
 window.validarAnoReteste = validarAnoReteste;
 window.setStatus = setStatus;
 
-// Inicialização ao carregar a página
-
+/**
+ * Realiza o cálculo automático das próximas datas de recarga (+1 ano)
+ * e reteste (+5 anos) com base na data de selagem e último reteste.
+ */
 function calcularDatasAutomaticas() {
   const campoDataSelagem = document.getElementById("data_selagem");
   const ultReteste = document.getElementById("ult_reteste").value;
   const displayRecarga = document.getElementById("display_prox_recarga");
   const displayReteste = document.getElementById("display_prox_reteste");
 
-  // 1. Cálculo Próxima Recarga (Mantido como Data)
-  let dataReferencia = campoDataSelagem.value
-    ? new Date(campoDataSelagem.value)
-    : new Date();
+  let dataReferencia =
+    campoDataSelagem && campoDataSelagem.value
+      ? new Date(campoDataSelagem.value)
+      : new Date();
 
   if (campoDataSelagem.value) {
     dataReferencia.setMinutes(
@@ -161,13 +142,12 @@ function calcularDatasAutomaticas() {
     displayRecarga.innerText = dataProxRecarga.toLocaleDateString("pt-BR");
   }
 
-  // 2. Cálculo Próximo Reteste (Ajustado para INTEIRO +5 anos)
   if (ultReteste && ultReteste.length === 4) {
     const anoBase = parseInt(ultReteste);
     const proximoReteste = anoBase + 5;
 
     if (displayReteste) {
-      displayReteste.innerText = proximoReteste; // Exibe ex: 2026
+      displayReteste.innerText = proximoReteste;
     }
   } else {
     if (displayReteste) displayReteste.innerText = "----";
@@ -175,15 +155,11 @@ function calcularDatasAutomaticas() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  setLevel(2); // Define Nível 2 como padrão ao abrir
-
-  // Define a data de hoje no input de selagem por padrão (Opcional, mas recomendado)
+  setLevel(2);
   const campoDataSelagem = document.getElementById("data_selagem");
   if (campoDataSelagem && !campoDataSelagem.value) {
     campoDataSelagem.value = new Date().toISOString().split("T")[0];
   }
-
-  // Chama o cálculo para preencher o "Próxima Recarga" imediatamente
   calcularDatasAutomaticas();
 });
 
@@ -199,7 +175,6 @@ function definirNivelPeloReteste() {
   const valorInformado = campoReteste.value;
   const anoAtual = new Date().getFullYear(); // 2026
 
-  // 1. Referências dos Checkboxes de Inspeção
   const checkboxes = document.querySelectorAll(".custom-checkbox");
   const getCheck = (texto) =>
     Array.from(checkboxes).find((c) =>
@@ -210,15 +185,12 @@ function definirNivelPeloReteste() {
   const chkPneumValv = getCheck("Ens. Pneum. Válvula");
   const chkHidroValv = getCheck("Ens. Hidrost. Válvula");
   const chkHidroMang = getCheck("Ens. Hidrost. Mangueira");
-
-  // 2. Referência FIXA do Checkbox de Pintura (que agora está na tela principal)
   const chkPintura = document.getElementById("comp_pintura");
 
   if (valorInformado.length === 4) {
     const anoReteste = parseInt(valorInformado);
     const diferencaAnos = anoAtual - anoReteste;
 
-    // RESET GERAL antes de aplicar a nova regra
     [
       chkPneumMano,
       chkPneumValv,

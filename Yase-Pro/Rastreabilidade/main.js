@@ -1,4 +1,3 @@
-// // Configuração do Supabase (Mantendo suas credenciais)
 const SUPABASE_URL = "https://gzojpxgpgjapsegerscb.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s";
@@ -18,7 +17,10 @@ window.nomeOperadorLogado = nomeOperadorLogado;
 window.currentOS = "";
 window.selectedLevel = 1;
 window.editandoID = null;
-// Inicialização ao carregar a página
+
+/**
+ * Inicialização global ao carregar a página de Rastreabilidade.
+ */
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("🚀 Iniciando carregamento de Rastreabilidade...");
   console.log("✅ Supabase inicializado:", _supabase ? "SIM" : "NÃO");
@@ -29,20 +31,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   console.log("📋 OS Atual:", window.currentOS);
 
-  // Atualiza os elementos visuais da OS
   const displayOS = document.getElementById("displayOS");
   const osBadgeNumber = document.getElementById("osBadgeNumber");
 
   if (displayOS) displayOS.innerText = window.currentOS;
   if (osBadgeNumber) osBadgeNumber.innerText = `OS: ${window.currentOS}`;
 
-  // Define a data de hoje por padrão
   const hoje = new Date().toISOString().split("T")[0];
   const campoData = document.getElementById("data_selagem");
   if (campoData) campoData.value = hoje;
 
-  // --- CARREGAMENTO INICIAL ---
-  // Limpeza preventiva contra Autofill (0013 bug)
   const forcarLimpeza = () => {
     const ids = ["X_input_id", "nr_cilindro", "inputBuscaModal"];
     ids.forEach((id) => {
@@ -56,7 +54,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (preview) preview.innerText = "";
   };
 
-  // Executa a limpeza imediata
   forcarLimpeza();
   setTimeout(forcarLimpeza, 500);
   setTimeout(forcarLimpeza, 1500);
@@ -65,31 +62,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (typeof window.carregarItens === "function") await window.carregarItens();
   if (typeof window.sincronizarPainelSelos === "function")
     await window.sincronizarPainelSelos();
-
-  // Carrega os Tipos de Carga para o Select
   if (typeof window.carregarTipos === "function") await window.carregarTipos();
 
-  // Pequeno intervalo para o navegador terminar de renderizar o HTML da tabela
   setTimeout(() => {
     if (typeof focarUltimoRegistro === "function") {
       focarUltimoRegistro();
     }
   }, 600);
 });
-
-// Ajuste na função loadItens para garantir a ordem correta
-// Removida a função loadItens duplicada para evitar conflitos de renderização.
-// O sistema agora utiliza exclusivamente carregarItens() de renderizarTabela.js.
-
-// Função de Logout
+/**
+ * Realiza o logout do sistema limpando a sessão.
+ */
 function logout() {
   sessionStorage.clear();
   window.location.href = "EntrarSistema.html";
 }
 
-// Para que o "Pesagem ABC"
-// mude automaticamente quando você trocar o tipo de extintor
 const tipoCargaElement = document.getElementById("tipo_carga");
+
+/**
+ * Atualiza o título do grupo de pesagem dinamicamente conforme o tipo de carga.
+ */
 if (tipoCargaElement) {
   tipoCargaElement.addEventListener("change", function () {
     const valor = this.value || "ABC";
@@ -106,8 +99,6 @@ _supabase
     { event: "*", schema: "public", table: "itens_os" },
     (payload) => {
       console.log("🔔 Mudança detectada no Supabase!", payload);
-
-      // Garante que a atualização ocorra via window
       const fnCarregar = window.carregarItens || window.loadItens;
       if (typeof fnCarregar === "function") {
         fnCarregar();
@@ -119,11 +110,8 @@ _supabase
 console.log("✅ Realtime listener ativado para tabela itens_os");
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Recupera o nome que guardamos no login
   const nomeOperador = localStorage.getItem("nome_operador");
   const nomeEmpresa = localStorage.getItem("nome_empresa");
-
-  // Alvo no seu HTML (certifique-se de que o ID coincida)
   const displayElement = document.getElementById("nome-operador-logado");
 
   if (displayElement && nomeOperador) {

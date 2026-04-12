@@ -1,4 +1,6 @@
-// FUNÇÃO UNIVERSAL DE CONFIRMAÇÃO
+/**
+ * Exibe um modal de confirmação genérico com título, mensagem e ação customizáveis.
+ */
 function solicitarConfirmacao({
   titulo,
   mensagem,
@@ -10,22 +12,18 @@ function solicitarConfirmacao({
   const modal = document.getElementById("confirmacaoGeral");
   const btn = document.getElementById("btnConfirmarAcaoGeral");
 
-  // Personaliza os textos e cores
   if (document.getElementById("tituloConfirmacao"))
     document.getElementById("tituloConfirmacao").innerText =
       titulo || "Tem certeza?";
   if (document.getElementById("msgConfirmacao"))
     document.getElementById("msgConfirmacao").innerHTML =
       mensagem || "Esta ação é permanente.";
-  // Removido referência a confirmIcon pois não existe no HTML original
 
-  // Ajusta a cor do botão (Ex: red-500 para excluir, indigo-600 para salvar)
   btn.className = `flex-[1.5] text-white font-bold py-4 rounded-2xl text-xs uppercase shadow-lg transition-all ${corBtn || "bg-red-500 hover:bg-red-600 shadow-red-200"}`;
   btn.innerText = textoBtn || "Confirmar";
 
   modal.classList.remove("hidden");
 
-  // Define o que acontece no clique
   btn.onclick = async () => {
     btn.disabled = true;
     const originalText = btn.innerText;

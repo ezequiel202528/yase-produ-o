@@ -176,10 +176,8 @@ async function prepararEdicao(id) {
 
     if (error) throw error;
 
-    // 1. Define o ID global para transformar o registro em UPDATE no registrarItem
     window.editandoID = id;
 
-    // 2. Mapeamento de campos (Conforme o teu Rastreio_Full.html)
     const campos = {
       X_input_id: data.fabricante_id,
       nr_cilindro: data.nr_cilindro,
@@ -205,23 +203,19 @@ async function prepararEdicao(id) {
       dvp_ep: data.dvp_ep,
     };
 
-    // Se houver fabricante, dispara a busca do nome para o preview
     if (data.fabricante_id) {
       window.buscarNomeFabricante(data.fabricante_id);
     }
 
-    // Preenche os inputs
     Object.entries(campos).forEach(([id, valor]) => {
       const el = document.getElementById(id);
       if (el) el.value = valor || "";
     });
 
-    // 3. Atualiza o Nível de Manutenção (NV1/NV2/NV3)
     if (data.nivel_manutencao && typeof setLevel === "function") {
       setLevel(parseInt(data.nivel_manutencao));
     }
 
-    // 4. Altera o botão para modo de Edição (Visual e Texto)
     const btnReg = document.querySelector('button[onclick="registrarItem()"]');
     if (btnReg) {
       btnReg.innerHTML =
@@ -245,7 +239,7 @@ async function prepararEdicao(id) {
 }
 
 /**
- * EXCLUSÃO DE ITEM: Com confirmação e sincronização em tempo real
+ * Abre o modal de confirmação para exclusão de um item.
  */
 window.deletarItem = async function (id) {
   const modal = document.getElementById("confirmacaoGeral");
@@ -258,43 +252,18 @@ window.deletarItem = async function (id) {
     return;
   }
 
-  // Abre o teu modal customizado
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 
-  // Configura o clique de confirmação
   btnConfirmar.onclick = async () => {
     await executarExclusao(id);
     fecharConfirmacaoGeral();
   };
 };
 
-// async function executarExclusao(id) {
-//     try {
-//         const { error } = await _supabase
-//             .from("itens_os")
-//             .delete()
-//             .eq("id", id);
-
-//         if (error) throw error;
-
-//         // --- ATUALIZAÇÃO FLASH ---
-//         // 1. Recarrega a tabela
-//         if (typeof carregarItens === "function") await carregarItens();
-
-//         // 2. Recalcula os selos e o contador (O segredo do flash)
-//         if (typeof sincronizarPainelSelos === "function") {
-//             await sincronizarPainelSelos();
-//         }
-
-//         console.log("Item removido e contador atualizado.");
-
-//     } catch (err) {
-//         console.error("Erro na exclusão:", err);
-//         alert("Erro ao excluir item.");
-//     }
-// }
-
+/**
+ * Executa a exclusão definitiva de um item no Supabase e atualiza a interface.
+ */
 async function executarExclusao(id) {
   try {
     const { error } = await _supabase.from("itens_os").delete().eq("id", id);
@@ -303,10 +272,8 @@ async function executarExclusao(id) {
     // 1. Recarrega a tabela visualmente
     if (typeof carregarItens === "function") await carregarItens();
 
-    // 2. O FLASH: Aguarda um milisegundo e força a atualização do contador
     setTimeout(async () => {
       await sincronizarPainelSelos();
-      console.log("Contador atualizado após exclusão!");
     }, 100);
   } catch (err) {
     console.error("Erro ao excluir:", err);
@@ -314,9 +281,6 @@ async function executarExclusao(id) {
   }
 }
 
-/**
- * FUNÇÕES DE INTERFACE (MODAIS)
- */
 window.fecharConfirmacaoGeral = function () {
   const modal = document.getElementById("confirmacaoGeral");
   if (modal) {
@@ -325,13 +289,12 @@ window.fecharConfirmacaoGeral = function () {
   }
 };
 
-// Alias para garantir que chame a função correta
 function fecharConfirmacao() {
   fecharConfirmacaoGeral();
 }
 
 /**
- * RESET DE FORMULÁRIO: Volta o botão ao estado original
+ * Reseta o botão de registro para o estado original (Novo Registro).
  */
 function resetarBotaoRegistro() {
   window.editandoID = null;
