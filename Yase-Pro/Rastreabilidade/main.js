@@ -88,7 +88,7 @@ async function loadItens() {
 
     const { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes(nome)")
+      .select("*, fabricantes (nome)")
       .eq("os_number", window.currentOS)
       .order("created_at", { ascending: true });
 

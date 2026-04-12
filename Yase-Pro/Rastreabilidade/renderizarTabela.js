@@ -46,11 +46,18 @@ async function carregarItens() {
 
     const { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes(nome)")
+      .select("*, fabricantes (nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+      console.warn(
+        "⚠️ Nota: Erro ao buscar nomes dos fabricantes. Verifique as Chaves Estrangeiras no Supabase.",
+        error,
+      );
+      // Fallback: Tenta buscar sem o join para a tabela não ficar vazia
+      return carregarItensSemJoin(osAtiva);
+    }
 
     const contadorEl = document.getElementById("itemCounter");
     if (contadorEl) contadorEl.innerText = data ? data.length : 0;
@@ -63,6 +70,27 @@ async function carregarItens() {
   } catch (err) {
     console.error("Erro ao carregar tabela:", err);
   }
+}
+
+// Função de segurança caso o Join falhe por falta de configuração no banco
+async function carregarItensSemJoin(osAtiva) {
+  const { data, error } = await _supabase
+    .from("itens_os")
+    .select("*")
+    .eq("os_number", osAtiva)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Erro crítico ao carregar itens:", error);
+    return;
+  }
+
+  const contadorEl = document.getElementById("itemCounter");
+  if (contadorEl) contadorEl.innerText = data ? data.length : 0;
+
+  renderItens(data);
+  configurarCliquesTabela();
+  destacarUltimaLinha();
 }
 
 // Auxiliar para formatar datas na visualização
@@ -420,7 +448,13 @@ function renderItens(itens) {
           </td>
           <td class="p-3 font-bold text-slate-200">${item.nr_cilindro || "S/N"}</td>
           <td class="p-3">${item.nbr || "-"}</td>
-          <td class="p-3">${item.fabricantes?.nome || item.fabricante_id || "-"}</td>
+          <td class="p-3">
+            ${
+              Array.isArray(item.fabricantes)
+                ? item.fabricantes[0]?.nome || item.fabricante_id || "-"
+                : item.fabricantes?.nome || item.fabricante_id || "-"
+            }
+          </td>
           <td class="p-3">${item.ano_fab || "-"}</td>
           <td class="p-3">${item.ult_reteste || "-"}</td>
           <td class="px-4 py-3 text-xs font-bold text-orange-500">${item.prox_reteste || "-"}</td>
