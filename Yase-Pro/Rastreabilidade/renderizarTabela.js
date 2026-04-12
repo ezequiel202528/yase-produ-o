@@ -44,16 +44,19 @@ async function carregarItens() {
     const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
     if (!osAtiva) return;
 
-    // 1. Consulta metódica: Tenta buscar os itens com o nome do fabricante (Join)
+    // 1. Consulta metódica: Forçamos o Join usando a coluna específica fabricante_id
     let { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes(nome)")
+      .select("*, fabricantes!fabricante_id(nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
-    // 2. Fallback de segurança (se o banco não tiver a FK configurada corretamente)
+    // 2. Se o Join falhar, tentamos a consulta padrão, mas o código de renderização tratará o ID
     if (error) {
-      console.warn("⚠️ Erro no Join de fabricantes:", error.message);
+      console.warn(
+        "⚠️ Erro no Join (Nomes). Renderizando IDs como fallback: ",
+        error.message,
+      );
       const fallback = await _supabase
         .from("itens_os")
         .select("*")
@@ -422,18 +425,15 @@ function renderItens(itens) {
         : "Sem alterações";
       const usuarioAlt = item.usuario_alteracao || "-";
 
-      // 3. Extração metódica do nome (mesma lógica do span de preview)
-      let nomeExibicao = item.fabricante_id || "-"; // Fallback para o ID caso o nome falhe
-      const relacao = item.fabricantes || item.fabricante;
+      // 3. Extração metódica do nome: Prioridade total ao Nome do Fabricante
+      const relacao = item.fabricantes;
+      let nomeExibicao = item.fabricante_id || "-";
 
       if (relacao) {
-        // O Supabase pode retornar um objeto ou um array de um único item
         const nomeBruto = Array.isArray(relacao)
           ? relacao[0]?.nome
           : relacao.nome;
-        if (nomeBruto) {
-          nomeExibicao = String(nomeBruto).toUpperCase();
-        }
+        if (nomeBruto) nomeExibicao = String(nomeBruto).toUpperCase();
       }
 
       return `
