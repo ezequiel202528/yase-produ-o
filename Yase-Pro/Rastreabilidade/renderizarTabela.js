@@ -953,12 +953,12 @@ function limparCamposAposRegistro() {
 
 document.addEventListener("keydown", function (e) {
   if (e.key === "Enter") {
-    // Ignora botões, áreas de texto e se o modal de busca estiver aberto
+    // Ignora a navegação automática se o usuário estiver dentro de qualquer Modal
+    if (e.target.closest(".fixed") || e.target.closest("[id^='modal']")) return;
+
+    // Ignora botões e áreas de texto
     if (e.target.tagName === "BUTTON" || e.target.tagName === "TEXTAREA")
       return;
-
-    // Ignora a navegação automática se o usuário estiver dentro de qualquer Modal
-    if (e.target.closest(".fixed")) return;
 
     const sequence = [
       "cod_barras",

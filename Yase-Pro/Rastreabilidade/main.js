@@ -42,6 +42,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (campoData) campoData.value = hoje;
 
   // --- CARREGAMENTO INICIAL ---
+  // Limpa campos para evitar preenchimento automático do navegador
+  if (document.getElementById("X_input_id")) document.getElementById("X_input_id").value = "";
+  if (document.getElementById("nr_cilindro")) document.getElementById("nr_cilindro").value = "";
+
   console.log("📥 Carregando itens do Supabase...");
   if (typeof window.carregarItens === "function") await window.carregarItens();
   if (typeof window.sincronizarPainelSelos === "function")

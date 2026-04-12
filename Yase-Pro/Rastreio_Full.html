@@ -149,7 +149,7 @@
          <div class="flex-1 relative flex items-center bg-slate-800 rounded-lg border border-slate-700 focus-within:ring-2 ring-indigo-500/20">
    <input type="number" id="X_input_id" 
     class="w-full h-8 pl-2 pr-2 text-[10px] bg-transparent outline-none text-white font-bold" 
-    placeholder="Fab." autocomplete="off"
+    placeholder="Fab." autocomplete="new-password"
     oninput="buscarNomeFabricante(this.value)"
     onkeydown="if(event.key === 'Enter') validarFabricanteAntesDeSeguir(event)">
     
@@ -574,9 +574,9 @@
 
             <div class="relative mb-6">
                 <input type="text" id="inputBuscaModal" 
-                    class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 px-5 text-white text-lg font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-600" autocomplete="off"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-xl py-4 px-5 text-white text-lg font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-600" autocomplete="new-password"
                     placeholder="Nº do Cilindro..."
-                    onkeyup="if(event.key === 'Enter') executarBuscaModal()">
+                    onkeydown="if(event.key === 'Enter') { event.preventDefault(); executarBuscaModal(); }">
             </div>
 
             <div class="flex gap-3">
