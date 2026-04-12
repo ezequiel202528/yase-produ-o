@@ -83,7 +83,7 @@ function selecionarFabricante(id, nome) {
     inputFabId.value = id;
 
     // 3. Atualiza a variável global para que o 'registrarItem' saiba que é válido
-    fabricanteValido = true;
+    window.fabricanteValido = true;
 
     // 4. Dispara a função de busca para atualizar o preview do nome ao lado do input
     // Isso garante que o nome apareça imediatamente sem precisar digitar
@@ -174,11 +174,11 @@ function filtrarFabricantes() {
 }
 
 // Variável global para controle de validação
-let fabricanteValido = false;
+window.fabricanteValido = false;
 
 async function buscarNomeFabricante(id) {
   const display = document.getElementById("nome_fabricante_preview");
-  fabricanteValido = false; // Reseta a cada digitação
+  window.fabricanteValido = false; // Reseta a cada digitação
 
   if (!id) {
     display.innerText = "";
@@ -197,21 +197,21 @@ async function buscarNomeFabricante(id) {
       display.innerText = primeiroNome.substring(0, 10);
       display.classList.remove("text-red-500");
       display.classList.add("text-emerald-500"); // Fica verde se achar
-      fabricanteValido = true;
+      window.fabricanteValido = true;
     } else {
       display.innerText = "NÃO ENCONTRADO";
       display.classList.remove("text-emerald-500");
       display.classList.add("text-red-500"); // Vermelho se não existir
-      fabricanteValido = false;
+      window.fabricanteValido = false;
     }
   } catch (err) {
     display.innerText = "ERRO";
-    fabricanteValido = false;
+    window.fabricanteValido = false;
   }
 }
 
 function validarFabricanteAntesDeSeguir(event) {
-  if (!fabricanteValido) {
+  if (!window.fabricanteValido) {
     event.preventDefault(); // Impede o envio do formulário/registro
 
     // Alerta moderno usando a estrutura de cores do seu sistema

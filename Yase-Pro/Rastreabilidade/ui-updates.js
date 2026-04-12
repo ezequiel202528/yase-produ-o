@@ -41,5 +41,22 @@ function fecharModalComponentes() {
   }
 }
 
+// Funções de busca rápida (Placeholders para evitar erro de 'not defined')
+function X_ABRIR_TIPO() {
+  console.log("Abrindo busca de tipos...");
+  // Aqui você pode implementar a lógica de modal de tipos futuramente
+}
+
+function openCapacidadeModal() {
+  console.log("Abrindo busca de capacidades...");
+}
+
+function X_ABRIR_NBR() {
+  console.log("Abrindo busca de NBRs...");
+}
+
 window.abrirModalComponentes = abrirModalComponentes;
 window.fecharModalComponentes = fecharModalComponentes;
+window.X_ABRIR_TIPO = X_ABRIR_TIPO;
+window.openCapacidadeModal = openCapacidadeModal;
+window.X_ABRIR_NBR = X_ABRIR_NBR;

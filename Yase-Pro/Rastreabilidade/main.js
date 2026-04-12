@@ -3,15 +3,21 @@ const SUPABASE_URL = "https://gzojpxgpgjapsegerscb.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s";
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-window._supabase = supabaseClient;
+if (!window._supabase) {
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+  );
+  window._supabase = supabaseClient;
+}
 const _supabase = window._supabase;
 
-const operadorAtual = localStorage.getItem("nome_operador") || "Sistema";
+const nomeOperadorLogado = localStorage.getItem("nome_operador") || "Sistema";
+window.nomeOperadorLogado = nomeOperadorLogado;
 
 window.currentOS = "";
 window.selectedLevel = 1;
-let editandoID = null;
+window.editandoID = null;
 // Inicialização ao carregar a página
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("🚀 Iniciando carregamento de Rastreabilidade...");
@@ -35,15 +41,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const campoData = document.getElementById("data_selagem");
   if (campoData) campoData.value = hoje;
 
-  // Verifica se renderItens existe
-  console.log(
-    "✅ renderItens disponível:",
-    typeof window.renderItens === "function" ? "SIM" : "NÃO",
-  );
-
   // --- CARREGAMENTO INICIAL ---
   console.log("📥 Carregando itens do Supabase...");
-  await loadItens();
+  if (typeof window.carregarItens === "function") await window.carregarItens();
+  if (typeof window.sincronizarPainelSelos === "function")
+    await window.sincronizarPainelSelos();
 
   // Pequeno intervalo para o navegador terminar de renderizar o HTML da tabela
   setTimeout(() => {

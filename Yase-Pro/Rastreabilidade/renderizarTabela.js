@@ -687,7 +687,7 @@ async function registrarItem() {
   const nomeOperadorLogado = localStorage.getItem("nome_operador");
   const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
 
-  if (typeof fabricanteValido !== "undefined" && !fabricanteValido) {
+  if (window.fabricanteValido === false) {
     exibirAlertaErro("ID do Fabricante não encontrado no banco de dados.");
 
     const inputFab = document.getElementById("X_input_id");
@@ -709,12 +709,11 @@ async function registrarItem() {
 
   try {
     // 2. BUSCA O SELO REAL NO BANCO (O GATILHO DO FLASH)
-    // Chamamos uma vez só aqui no início do try
-    const checagem = await sincronizarPainelSelos();
-
-    // Se a função retornar que não pode gravar (lote vazio), paramos aqui
-    if (window.proximoSeloCalculado === undefined) {
-      alert("⚠️ Erro ao calcular próximo selo ou lote esgotado.");
+    // Adicionada verificação de existência da função para evitar crash
+    if (typeof sincronizarPainelSelos === "function") {
+      await sincronizarPainelSelos();
+    } else if (!window.proximoSeloCalculado && !window.editandoID) {
+      alert("⚠️ Sistema de controle de selos não inicializado.");
       return;
     }
 
@@ -742,12 +741,10 @@ async function registrarItem() {
     const dados = {
       os_number: osAtiva,
       empresa_id: empresaIdLogada,
+      usuario_lancamento: window.editandoID
+        ? undefined
+        : nomeOperadorLogado || "Sistema",
       usuario_alteracao: nomeOperadorLogado || "Sistema",
-
-      // ✅ SEQUÊNCIA CORRETA
-      usuario_alteracao: window.editandoID
-        ? nomeOperadorLogado || "Sistema"
-        : nomeOperadorLogado,
       updated_at: new Date().toISOString(),
       selo_inmetro: seloNumParaGravar,
       prefixo_selo: prefixoParaGravar,
@@ -947,14 +944,9 @@ function limparCamposAposRegistro() {
   }, 100);
 }
 
-// Inicialização
-window.addEventListener("load", () => {
-  setTimeout(carregarItens, 500);
-});
-
 document.addEventListener("keydown", function (e) {
   if (e.key === "Enter") {
-    // Ignora botões e áreas de texto
+    // Ignora botões, áreas de texto e se o modal de busca estiver aberto
     if (e.target.tagName === "BUTTON" || e.target.tagName === "TEXTAREA")
       return;
 
@@ -1029,8 +1021,6 @@ document.addEventListener("keydown", function (e) {
 });
 
 window.carregarItens = carregarItens;
-window.deletarItem = deletarItem;
-window.prepararEdicao = prepararEdicao;
 window.focarUltimoRegistro = focarUltimoRegistro;
 window.renderItens = renderItens;
 window.destacarLinha = destacarLinha;

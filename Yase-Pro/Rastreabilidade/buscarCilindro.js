@@ -1,7 +1,13 @@
 // Garante acesso ao cliente Supabase global
-const _supabase = window._supabase;
+const getSupabase = () =>
+  window._supabase ||
+  window.supabase.createClient(
+    "https://gzojpxgpgjapsegerscb.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s",
+  );
 
 async function buscarCilindro() {
+  const _supabase = getSupabase();
   const nrCilindro = document.getElementById("nr_cilindro").value.trim();
   const osAtual = document.getElementById("osBadgeNumber").innerText; // Pega o número da OS carregada
 
@@ -75,10 +81,11 @@ function fecharModalBusca() {
 }
 
 async function executarBuscaModal() {
+  const _supabase = getSupabase();
   const nrCilindroBusca = document
     .getElementById("inputBuscaModal")
     .value.trim();
-  const osAtual = window.currentOS;
+  const osAtual = window.currentOS || sessionStorage.getItem("currentOS");
 
   if (!nrCilindroBusca) return;
 

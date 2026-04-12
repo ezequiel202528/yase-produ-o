@@ -337,3 +337,7 @@ function resetarBotaoRegistro() {
     btnReg.classList.add("bg-indigo-600");
   }
 }
+
+window.prepararEdicao = prepararEdicao;
+window.resetarBotaoRegistro = resetarBotaoRegistro;
+window.fecharConfirmacao = fecharConfirmacao;
