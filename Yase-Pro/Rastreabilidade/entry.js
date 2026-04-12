@@ -12,4 +12,3 @@ import "./etiquetas.js";
 import "./buscarCilindro.js";
 import "./inutilizar.js";
 import "./nbr.js";
-import "./tipos.js";

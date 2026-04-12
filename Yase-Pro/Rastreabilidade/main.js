@@ -47,9 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (typeof window.sincronizarPainelSelos === "function")
     await window.sincronizarPainelSelos();
 
-  // Carrega os Tipos de Carga para o Select
-  if (typeof window.carregarTipos === "function") await window.carregarTipos();
-
   // Pequeno intervalo para o navegador terminar de renderizar o HTML da tabela
   setTimeout(() => {
     if (typeof focarUltimoRegistro === "function") {
