@@ -42,9 +42,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (campoData) campoData.value = hoje;
 
   // --- CARREGAMENTO INICIAL ---
-  // Limpa campos para evitar preenchimento automático do navegador
-  if (document.getElementById("X_input_id")) document.getElementById("X_input_id").value = "";
-  if (document.getElementById("nr_cilindro")) document.getElementById("nr_cilindro").value = "";
+  // Limpa campos com um pequeno delay para vencer o autofill do navegador
+  setTimeout(() => {
+    const f1 = document.getElementById("X_input_id");
+    const f2 = document.getElementById("nr_cilindro");
+    if (f1) {
+      f1.value = "";
+      f1.blur();
+    }
+    if (f2) {
+      f2.value = "";
+      f2.blur();
+    }
+  }, 200);
 
   console.log("📥 Carregando itens do Supabase...");
   if (typeof window.carregarItens === "function") await window.carregarItens();

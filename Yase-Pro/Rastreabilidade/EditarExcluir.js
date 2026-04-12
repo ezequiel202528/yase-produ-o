@@ -181,6 +181,7 @@ async function prepararEdicao(id) {
 
     // 2. Mapeamento de campos (Conforme o teu Rastreio_Full.html)
     const campos = {
+      X_input_id: data.fabricante_id,
       nr_cilindro: data.nr_cilindro,
       ano_fab: data.ano_fab,
       ult_reteste: data.ult_reteste,
@@ -203,6 +204,11 @@ async function prepararEdicao(id) {
       dvm_et: data.dvm_et,
       dvp_ep: data.dvp_ep,
     };
+
+    // Se houver fabricante, dispara a busca do nome para o preview
+    if (data.fabricante_id) {
+      window.buscarNomeFabricante(data.fabricante_id);
+    }
 
     // Preenche os inputs
     Object.entries(campos).forEach(([id, valor]) => {

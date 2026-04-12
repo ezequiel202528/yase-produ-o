@@ -78,6 +78,7 @@ function abrirModalBusca() {
 function fecharModalBusca() {
   const modal = document.getElementById("modalBuscaCilindro");
   if (modal) {
+    document.getElementById("inputBuscaModal").blur();
     modal.classList.add("hidden");
     document.getElementById("inputBuscaModal").value = "";
   }
