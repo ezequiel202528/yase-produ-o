@@ -27,7 +27,7 @@ function renderizarListaNBR(lista) {
   container.innerHTML = (lista || [])
     .map(
       (item) => `
-        <div class="flex items-center justify-between p-3 bg-slate-800/30 border border-slate-700/30 rounded-xl hover:border-indigo-500 hover:bg-slate-800/60 transition-all group">
+        <div class="flex items-center justify-between p-3 bg-slate-800/30 border border-slate-700/30 rounded-xl hover:border-amber-500 hover:bg-slate-800/60 transition-all group">
             <div onclick="selecionarNBR('${item.nome}')" class="flex-1 cursor-pointer">
                 <span class="text-slate-200 text-xs font-bold uppercase">${item.nome}</span>
             </div>
