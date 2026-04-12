@@ -3,9 +3,6 @@
  * renderizarTabela.js - Versão Integral 2026
  */
 
-// Garante acesso ao cliente Supabase global inicializado no main.js
-const _supabase = window._supabase;
-
 // 1. CARREGAMENTO E SINCRONIZAÇÃO
 // async function carregarItens() {
 //   try {
@@ -41,13 +38,16 @@ let selectedRowIndex = -1;
 // 1. CARREGAMENTO E SINCRONIZAÇÃO (Mantido conforme seu original)
 async function carregarItens() {
   try {
+    const _supabase = window._supabase;
+    if (!_supabase) return;
+
     const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
     if (!osAtiva) return;
 
-    // 1. Consulta metódica: Força o Join usando a FK específica 'fabricante_id'
+    // 1. Consulta metódica: Tenta buscar os itens com o nome do fabricante (Join)
     let { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes!fabricante_id(nome)")
+      .select("*, fabricantes(nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
@@ -423,14 +423,14 @@ function renderItens(itens) {
       const usuarioAlt = item.usuario_alteracao || "-";
 
       // 3. Extração metódica do nome (mesma lógica do span de preview)
-      let nomeExibicao = item.fabricante_id || "-";
-      const relacaoFab = item.fabricantes || item.fabricante;
+      let nomeExibicao = item.fabricante_id || "-"; // Fallback para o ID caso o nome falhe
+      const relacao = item.fabricantes || item.fabricante;
 
-      if (relacaoFab) {
-        // Supabase pode retornar array ou objeto dependendo da relação
-        const nomeBruto = Array.isArray(relacaoFab)
-          ? relacaoFab[0]?.nome
-          : relacaoFab.nome;
+      if (relacao) {
+        // O Supabase pode retornar um objeto ou um array de um único item
+        const nomeBruto = Array.isArray(relacao)
+          ? relacao[0]?.nome
+          : relacao.nome;
         if (nomeBruto) {
           nomeExibicao = String(nomeBruto).toUpperCase();
         }
