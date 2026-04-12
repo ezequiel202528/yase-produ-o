@@ -86,13 +86,28 @@ async function loadItens() {
     const tabelaElement = document.getElementById("itensList");
     console.log("✅ Tabela DOM encontrada:", tabelaElement ? "SIM" : "NÃO");
 
-    const { data, error } = await _supabase
+    let { data, error } = await _supabase
       .from("itens_os")
       .select("*, fabricantes (nome)")
       .eq("os_number", window.currentOS)
       .order("created_at", { ascending: true });
 
     if (error) {
+      console.warn(
+        "⚠️ Fallback no loadItens devido a erro no Join:",
+        error.message,
+      );
+      const fallback = await _supabase
+        .from("itens_os")
+        .select("*")
+        .eq("os_number", window.currentOS)
+        .order("created_at", { ascending: true });
+
+      if (fallback.error) throw fallback.error;
+      data = fallback.data;
+    }
+
+    if (!data) {
       console.error("❌ Erro Supabase:", error);
       throw error;
     }

@@ -44,19 +44,27 @@ async function carregarItens() {
     const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
     if (!osAtiva) return;
 
-    const { data, error } = await _supabase
+    // Tenta carregar com o nome do fabricante (Join)
+    let { data, error } = await _supabase
       .from("itens_os")
       .select("*, fabricantes (nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
+    // SEGUNDA CHANCE: Se o Join falhar (erro de relação no banco), busca apenas os dados básicos
     if (error) {
       console.warn(
-        "⚠️ Nota: Erro ao buscar nomes dos fabricantes. Verifique as Chaves Estrangeiras no Supabase.",
+        "⚠️ Falha na relação de fabricantes. Renderizando apenas com IDs para manter estabilidade.",
         error,
       );
-      // Fallback: Tenta buscar sem o join para a tabela não ficar vazia
-      return carregarItensSemJoin(osAtiva);
+      const fallback = await _supabase
+        .from("itens_os")
+        .select("*")
+        .eq("os_number", osAtiva)
+        .order("created_at", { ascending: true });
+
+      if (fallback.error) throw fallback.error;
+      data = fallback.data;
     }
 
     const contadorEl = document.getElementById("itemCounter");
@@ -70,27 +78,6 @@ async function carregarItens() {
   } catch (err) {
     console.error("Erro ao carregar tabela:", err);
   }
-}
-
-// Função de segurança caso o Join falhe por falta de configuração no banco
-async function carregarItensSemJoin(osAtiva) {
-  const { data, error } = await _supabase
-    .from("itens_os")
-    .select("*")
-    .eq("os_number", osAtiva)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    console.error("Erro crítico ao carregar itens:", error);
-    return;
-  }
-
-  const contadorEl = document.getElementById("itemCounter");
-  if (contadorEl) contadorEl.innerText = data ? data.length : 0;
-
-  renderItens(data);
-  configurarCliquesTabela();
-  destacarUltimaLinha();
 }
 
 // Auxiliar para formatar datas na visualização
@@ -438,6 +425,11 @@ function renderItens(itens) {
         : "Sem alterações";
       const usuarioAlt = item.usuario_alteracao || "-";
 
+      // Lógica resiliente para pegar o nome do fabricante (suporta objeto ou array de retorno)
+      const nomeFab = Array.isArray(item.fabricantes)
+        ? item.fabricantes[0]?.nome
+        : item.fabricantes?.nome;
+
       return `
         <tr data-index="${index}" class="group text-[11px] border-b border-slate-800 hover:bg-slate-800/40 transition-colors whitespace-nowrap ${corDaLinha}">
           <td class="p-3 sticky left-0 z-[40] bg-[#0f172a] border-r border-slate-700 font-bold group-hover:bg-[#1e293b] transition-colors">
@@ -448,13 +440,7 @@ function renderItens(itens) {
           </td>
           <td class="p-3 font-bold text-slate-200">${item.nr_cilindro || "S/N"}</td>
           <td class="p-3">${item.nbr || "-"}</td>
-          <td class="p-3">
-            ${
-              Array.isArray(item.fabricantes)
-                ? item.fabricantes[0]?.nome || item.fabricante_id || "-"
-                : item.fabricantes?.nome || item.fabricante_id || "-"
-            }
-          </td>
+          <td class="p-3">${nomeFab || item.fabricante_id || "-"}</td>
           <td class="p-3">${item.ano_fab || "-"}</td>
           <td class="p-3">${item.ult_reteste || "-"}</td>
           <td class="px-4 py-3 text-xs font-bold text-orange-500">${item.prox_reteste || "-"}</td>
