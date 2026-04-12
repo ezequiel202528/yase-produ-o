@@ -217,7 +217,7 @@ function aplicarBloqueioSistema(quantidade) {
 }
 
 // Inicializa
-document.addEventListener("DOMContentLoaded", monitorarLoteAtivo);
+document.addEventListener("DOMContentLoaded", sincronizarPainelSelos);
 
 async function verificarDisponibilidadeSeloRealtime() {
   try {

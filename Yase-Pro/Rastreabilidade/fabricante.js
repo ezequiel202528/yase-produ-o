@@ -1,68 +1,13 @@
-// Garante que a instância do Supabase seja reconhecida
-const _supabase = window._supabase;
+// Função auxiliar para obter o Supabase com segurança
+const getSupa = () => window._supabase || window.supabase;
 
-// Se você usa uma variável chamada 'supabase' em outros scripts,
-// certifique-se de que ela está disponível globalmente.
-
-// Abrir e fechar Modal
-// (Definido novamente mais abaixo para manter a versão correta com _supabase)
-
-// Renderizar itens na lista
 function renderizarListaFabricantes(lista) {
   const container = document.getElementById("listaFabricantes");
-  container.innerHTML = lista
+  if (!container) return;
+  
+  container.innerHTML = (lista || [])
     .map(
       (fab) => `
-        <div onclick="selecionarFabricante('${fab.id}', '${fab.nome}')" 
-             class="flex justify-between items-center p-3 bg-slate-800/50 hover:bg-indigo-600/30 border border-slate-700 rounded-xl cursor-pointer transition-all group">
-            <span class="text-indigo-400 font-bold text-[10px]">ID: ${fab.id}</span>
-            <span class="text-white text-xs font-medium uppercase">${fab.nome}</span>
-            <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-white text-[10px]"></i>
-        </div>
-    `,
-    )
-    .join("");
-}
-
-// 2. Evento para o Input de Fabricante (Busca por ID ao digitar)
-document
-  .getElementById("X_input_id")
-  .addEventListener("blur", async function () {
-    const valor = this.value.trim();
-
-    // Se o usuário digitou apenas um número (ID)
-    if (valor && !isNaN(valor)) {
-      const { data, error } = await _supabase
-        .from("fabricantes")
-        .select("nome")
-        .eq("id", parseInt(valor))
-        .single();
-
-      if (data) {
-        // Formata o input: "ID - NOME"
-        this.value = `${valor} - ${data.nome}`;
-        this.classList.add("border-emerald-500"); // Feedback visual de sucesso
-      } else {
-        alert("Fabricante com ID " + valor + " não encontrado.");
-        this.value = "";
-      }
-    }
-  });
-
-// 3. Cadastro com atualização em tempo real// 1. Carregar lista no modal (Nome + ID)
-async function carregarFabricantes() {
-  const { data, error } = await _supabase
-    .from("fabricantes")
-    .select("id, nome")
-    .order("id", { ascending: true }); // Mantendo a ordem do 1 ao último
-
-  if (error) return;
-
-  const container = document.getElementById("listaFabricantes");
-  if (container) {
-    container.innerHTML = data
-      .map(
-        (fab) => `
             <div onclick="selecionarFabricante('${fab.id}', '${fab.nome}')" 
                  class="flex items-center gap-3 p-3 bg-slate-800/30 border border-slate-700/30 rounded-xl hover:border-amber-500 hover:bg-slate-800/60 transition-all cursor-pointer group">
                 <span class="bg-amber-500/10 text-amber-500 font-black text-[10px] px-2 py-1 rounded-md group-hover:bg-amber-500 group-hover:text-slate-900">ID: ${fab.id}</span>
@@ -72,7 +17,7 @@ async function carregarFabricantes() {
       )
       .join("");
   }
-}
+
 
 function selecionarFabricante(id, nome) {
   // 1. Encontra o input de ID do fabricante
@@ -186,10 +131,10 @@ async function buscarNomeFabricante(id) {
   }
 
   try {
-    const { data, error } = await _supabase
+    const { data, error } = await getSupa()
       .from("fabricantes")
       .select("nome")
-      .eq("id", id)
+      .eq("id", parseInt(id))
       .single();
 
     if (data && data.nome) {
