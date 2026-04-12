@@ -2,7 +2,8 @@
 const SUPABASE_URL = "https://gzojpxgpgjapsegerscb.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s";
-const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+window._supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const _supabase = window._supabase;
 
 const operadorAtual = localStorage.getItem("nome_operador") || "Sistema";
 
@@ -35,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Verifica se renderItens existe
   console.log(
     "✅ renderItens disponível:",
-    typeof renderItens === "function" ? "SIM" : "NÃO",
+    typeof window.renderItens === "function" ? "SIM" : "NÃO",
   );
 
   // --- CARREGAMENTO INICIAL ---
@@ -74,8 +75,8 @@ async function loadItens() {
     console.log("📊 Primeiros dados:", data?.[0] || "vazio");
 
     // Chama renderItens com os dados
-    if (typeof renderItens === "function") {
-      renderItens(data);
+    if (typeof window.renderItens === "function") {
+      window.renderItens(data);
       console.log("✅ Tabela renderizada com sucesso");
     } else {
       console.error("❌ renderItens não está definida!");
@@ -110,11 +111,11 @@ _supabase
     { event: "*", schema: "public", table: "itens_os" },
     (payload) => {
       console.log("🔔 Mudança detectada no Supabase!", payload);
-      // Chama loadItens ao invés de carregarItens
+
       if (typeof window.carregarItens === "function") {
         window.carregarItens();
       } else {
-        loadItens();
+        window.loadItens();
       }
     },
   )

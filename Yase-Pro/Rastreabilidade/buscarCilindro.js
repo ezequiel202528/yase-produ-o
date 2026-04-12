@@ -1,3 +1,6 @@
+// Garante acesso ao cliente Supabase global
+const _supabase = window._supabase;
+
 async function buscarCilindro() {
   const nrCilindro = document.getElementById("nr_cilindro").value.trim();
   const osAtual = document.getElementById("osBadgeNumber").innerText; // Pega o número da OS carregada

@@ -1,3 +1,6 @@
+// Garante acesso ao cliente Supabase global
+const _supabase = window._supabase;
+
 let idParaInutilizar = null;
 
 function abrirModalInutilizar(id) {

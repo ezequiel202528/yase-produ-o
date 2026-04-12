@@ -3,6 +3,9 @@
  * renderizarTabela.js - Versão Integral 2026
  */
 
+// Garante acesso ao cliente Supabase global inicializado no main.js
+const _supabase = window._supabase;
+
 // 1. CARREGAMENTO E SINCRONIZAÇÃO
 // async function carregarItens() {
 //   try {

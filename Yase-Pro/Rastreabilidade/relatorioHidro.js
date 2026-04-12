@@ -1,4 +1,8 @@
 async function gerarRelatorioSaida() {
+  // Busca as referências no momento do clique, garantindo que o banco já carregou
+  const _supabase = window._supabase;
+  const currentOS = window.currentOS;
+
   const { data: itens, error } = await _supabase
     .from("itens_os")
     .select("*")

@@ -3,6 +3,9 @@
  * Sincronização do Contador de Selos em Tempo Real
  */
 
+// Garante acesso ao cliente Supabase global
+const _supabase = window._supabase;
+
 // async function sincronizarPainelSelos() {
 //     const elLote = document.getElementById('lote_documento');
 //     const elSeloProx = document.getElementById('proximo_selo_num');

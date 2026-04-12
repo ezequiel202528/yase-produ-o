@@ -71,7 +71,7 @@
 
 //         // 5. Feedback visual: sobe para o formulário
 //         window.scrollTo({ top: 0, behavior: 'smooth' });
-        
+
 //         // Recalcula displays de validade se a função existir
 //         if (typeof calcularDatasAutomaticas === "function") {
 //             calcularDatasAutomaticas();
@@ -157,108 +157,110 @@
  * Edição, Exclusão e Sincronização em Tempo Real
  */
 
+// Garante acesso ao cliente Supabase global
+const _supabase = window._supabase;
+
 // Variável global para controlar se estamos editando um item existente
 window.editandoID = null;
-
 
 /**
  * PREPARAR EDIÇÃO: Busca dados no Supabase e preenche o formulário
  */
 async function prepararEdicao(id) {
-    try {
-        const { data, error } = await _supabase
-            .from("itens_os")
-            .select("*")
-            .eq("id", id)
-            .single();
+  try {
+    const { data, error } = await _supabase
+      .from("itens_os")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-        if (error) throw error;
+    if (error) throw error;
 
-        // 1. Define o ID global para transformar o registro em UPDATE no registrarItem
-        window.editandoID = id;
+    // 1. Define o ID global para transformar o registro em UPDATE no registrarItem
+    window.editandoID = id;
 
-        // 2. Mapeamento de campos (Conforme o teu Rastreio_Full.html)
-        const campos = {
-            "nr_cilindro": data.nr_cilindro,
-            "ano_fab": data.ano_fab,
-            "ult_reteste": data.ult_reteste,
-            "tipo_carga": data.tipo_carga,
-            "capacidade": data.capacidade,
-            "nbr_select": data.nbr,
-            "lote_nitrogenio": data.lote_nitrogenio,
-            "ampola_vinculada": data.ampola_vinculada,
-            "selo_anterior": data.selo_anterior,
-            "N-Patrimonio": data.num_patrimonio,
-            "deposito_galpao": data.deposito_galpao,
-            "local_extintor": data.local_especifico,
-            "obs_ensaio": data.obs_ensaio,
-            "p_vazio_valvula": data.p_vazio_valvula,
-            "p_cheio_valvula": data.p_cheio_valvula,
-            "p_atual": data.p_atual,
-            "tara_cilindro": data.tara_cilindro,
-            "p_cil_vazio_kg": data.p_cil_vazio_kg,
-            "vol_litros": data.vol_litros,
-            "dvm_et": data.dvm_et,
-            "dvp_ep": data.dvp_ep
-        };
+    // 2. Mapeamento de campos (Conforme o teu Rastreio_Full.html)
+    const campos = {
+      nr_cilindro: data.nr_cilindro,
+      ano_fab: data.ano_fab,
+      ult_reteste: data.ult_reteste,
+      tipo_carga: data.tipo_carga,
+      capacidade: data.capacidade,
+      nbr_select: data.nbr,
+      lote_nitrogenio: data.lote_nitrogenio,
+      ampola_vinculada: data.ampola_vinculada,
+      selo_anterior: data.selo_anterior,
+      "N-Patrimonio": data.num_patrimonio,
+      deposito_galpao: data.deposito_galpao,
+      local_extintor: data.local_especifico,
+      obs_ensaio: data.obs_ensaio,
+      p_vazio_valvula: data.p_vazio_valvula,
+      p_cheio_valvula: data.p_cheio_valvula,
+      p_atual: data.p_atual,
+      tara_cilindro: data.tara_cilindro,
+      p_cil_vazio_kg: data.p_cil_vazio_kg,
+      vol_litros: data.vol_litros,
+      dvm_et: data.dvm_et,
+      dvp_ep: data.dvp_ep,
+    };
 
-        // Preenche os inputs
-        Object.entries(campos).forEach(([id, valor]) => {
-            const el = document.getElementById(id);
-            if (el) el.value = valor || "";
-        });
+    // Preenche os inputs
+    Object.entries(campos).forEach(([id, valor]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = valor || "";
+    });
 
-        // 3. Atualiza o Nível de Manutenção (NV1/NV2/NV3)
-        if (data.nivel_manutencao && typeof setLevel === "function") {
-            setLevel(parseInt(data.nivel_manutencao));
-        }
-
-        // 4. Altera o botão para modo de Edição (Visual e Texto)
-        const btnReg = document.querySelector('button[onclick="registrarItem()"]');
-        if (btnReg) {
-            btnReg.innerHTML = '<i class="fa-solid fa-save mr-2"></i> SALVAR ALTERAÇÕES';
-            btnReg.classList.remove("bg-indigo-600");
-            btnReg.classList.add("bg-emerald-500", "scale-105");
-        }
-
-        // 5. Scroll suave para o topo para o técnico editar
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        if (typeof calcularDatasAutomaticas === "function") {
-            calcularDatasAutomaticas();
-        }
-
-        console.log("Modo de edição ativado para o ID:", id);
-
-    } catch (err) {
-        console.error("Erro ao carregar edição:", err);
-        alert("Erro ao buscar dados para edição.");
+    // 3. Atualiza o Nível de Manutenção (NV1/NV2/NV3)
+    if (data.nivel_manutencao && typeof setLevel === "function") {
+      setLevel(parseInt(data.nivel_manutencao));
     }
+
+    // 4. Altera o botão para modo de Edição (Visual e Texto)
+    const btnReg = document.querySelector('button[onclick="registrarItem()"]');
+    if (btnReg) {
+      btnReg.innerHTML =
+        '<i class="fa-solid fa-save mr-2"></i> SALVAR ALTERAÇÕES';
+      btnReg.classList.remove("bg-indigo-600");
+      btnReg.classList.add("bg-emerald-500", "scale-105");
+    }
+
+    // 5. Scroll suave para o topo para o técnico editar
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (typeof calcularDatasAutomaticas === "function") {
+      calcularDatasAutomaticas();
+    }
+
+    console.log("Modo de edição ativado para o ID:", id);
+  } catch (err) {
+    console.error("Erro ao carregar edição:", err);
+    alert("Erro ao buscar dados para edição.");
+  }
 }
 
 /**
  * EXCLUSÃO DE ITEM: Com confirmação e sincronização em tempo real
  */
-window.deletarItem = async function(id) {
-    const modal = document.getElementById("confirmacaoGeral");
-    const btnConfirmar = document.getElementById("btnConfirmarAcaoGeral");
+window.deletarItem = async function (id) {
+  const modal = document.getElementById("confirmacaoGeral");
+  const btnConfirmar = document.getElementById("btnConfirmarAcaoGeral");
 
-    if (!modal) {
-        if (confirm("Tem certeza que deseja excluir este item permanentemente?")) {
-            await executarExclusao(id);
-        }
-        return;
+  if (!modal) {
+    if (confirm("Tem certeza que deseja excluir este item permanentemente?")) {
+      await executarExclusao(id);
     }
+    return;
+  }
 
-    // Abre o teu modal customizado
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+  // Abre o teu modal customizado
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
 
-    // Configura o clique de confirmação
-    btnConfirmar.onclick = async () => {
-        await executarExclusao(id);
-        fecharConfirmacaoGeral();
-    };
+  // Configura o clique de confirmação
+  btnConfirmar.onclick = async () => {
+    await executarExclusao(id);
+    fecharConfirmacaoGeral();
+  };
 };
 
 // async function executarExclusao(id) {
@@ -288,49 +290,50 @@ window.deletarItem = async function(id) {
 // }
 
 async function executarExclusao(id) {
-    try {
-        const { error } = await _supabase.from("itens_os").delete().eq("id", id);
-        if (error) throw error;
+  try {
+    const { error } = await _supabase.from("itens_os").delete().eq("id", id);
+    if (error) throw error;
 
-        // 1. Recarrega a tabela visualmente
-        if (typeof carregarItens === "function") await carregarItens();
+    // 1. Recarrega a tabela visualmente
+    if (typeof carregarItens === "function") await carregarItens();
 
-        // 2. O FLASH: Aguarda um milisegundo e força a atualização do contador
-        setTimeout(async () => {
-            await sincronizarPainelSelos();
-            console.log("Contador atualizado após exclusão!");
-        }, 100);
-
-    } catch (err) {
-        console.error("Erro ao excluir:", err);
-        alert("Erro na exclusão.");
-    }
+    // 2. O FLASH: Aguarda um milisegundo e força a atualização do contador
+    setTimeout(async () => {
+      await sincronizarPainelSelos();
+      console.log("Contador atualizado após exclusão!");
+    }, 100);
+  } catch (err) {
+    console.error("Erro ao excluir:", err);
+    alert("Erro na exclusão.");
+  }
 }
-
 
 /**
  * FUNÇÕES DE INTERFACE (MODAIS)
  */
-window.fecharConfirmacaoGeral = function() {
-    const modal = document.getElementById("confirmacaoGeral");
-    if (modal) {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-    }
+window.fecharConfirmacaoGeral = function () {
+  const modal = document.getElementById("confirmacaoGeral");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
 };
 
 // Alias para garantir que chame a função correta
-function fecharConfirmacao() { fecharConfirmacaoGeral(); }
+function fecharConfirmacao() {
+  fecharConfirmacaoGeral();
+}
 
 /**
  * RESET DE FORMULÁRIO: Volta o botão ao estado original
  */
 function resetarBotaoRegistro() {
-    window.editandoID = null;
-    const btnReg = document.querySelector('button[onclick="registrarItem()"]');
-    if (btnReg) {
-        btnReg.innerHTML = '<i class="fa-solid fa-plus mr-2"></i> REGISTRAR EXTINTOR';
-        btnReg.classList.remove("bg-emerald-500", "scale-105");
-        btnReg.classList.add("bg-indigo-600");
-    }
+  window.editandoID = null;
+  const btnReg = document.querySelector('button[onclick="registrarItem()"]');
+  if (btnReg) {
+    btnReg.innerHTML =
+      '<i class="fa-solid fa-plus mr-2"></i> REGISTRAR EXTINTOR';
+    btnReg.classList.remove("bg-emerald-500", "scale-105");
+    btnReg.classList.add("bg-indigo-600");
+  }
 }

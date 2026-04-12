@@ -1,5 +1,5 @@
 // Garante que a instância do Supabase seja reconhecida
-const supabaseClient = window._supabase;
+const _supabase = window._supabase;
 
 // Se você usa uma variável chamada 'supabase' em outros scripts,
 // certifique-se de que ela está disponível globalmente.
@@ -32,7 +32,7 @@ document
 
     // Se o usuário digitou apenas um número (ID)
     if (valor && !isNaN(valor)) {
-      const { data, error } = await supabase
+      const { data, error } = await _supabase
         .from("fabricantes")
         .select("nome")
         .eq("id", parseInt(valor))

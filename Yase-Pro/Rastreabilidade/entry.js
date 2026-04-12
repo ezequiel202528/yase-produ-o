@@ -1,4 +1,4 @@
-import "./api-service.js";
+import "./main.js";
 import "./calculos-tecnicos.js";
 import "./funcaoUniversalDeConfirmacao.js";
 import "./renderizarTabela.js";
@@ -11,4 +11,3 @@ import "./relatorioHidro.js";
 import "./etiquetas.js";
 import "./buscarCilindro.js";
 import "./inutilizar.js";
-import "./main.js";

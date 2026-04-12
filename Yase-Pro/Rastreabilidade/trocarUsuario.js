@@ -1,3 +1,6 @@
+// Garante acesso ao cliente Supabase global
+const _supabase = window._supabase;
+
 function abrirModalTrocaUsuario() {
   document.getElementById("modalTrocaUsuario").classList.remove("hidden");
   document.getElementById("modalTrocaUsuario").classList.add("flex");
@@ -25,8 +28,7 @@ async function confirmarTrocaUsuario() {
 
   try {
     // Busca o usuário no banco de dados
-    // Use a mesma variável 'sb' (Supabase) definida no seu main.js
-    const { data, error } = await sb
+    const { data, error } = await _supabase
       .from("usu_arios")
       .select("nome_completo")
       .eq("codigo_id", codigo)

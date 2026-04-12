@@ -1,5 +1,8 @@
 // ui-updates.js - FUNÇÃO COMPLETA
 
+// Garante acesso ao cliente Supabase global
+const _supabase = window._supabase;
+
 // Inicia e escuta mudanças
 window.addEventListener("load", () => {
   sincronizarPainelSelos();
