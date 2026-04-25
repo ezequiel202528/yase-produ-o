@@ -3,8 +3,12 @@
  */
 
 const getSupa = () => window._supabase || window.supabase;
-window.editandoCapacidadeId = null;
 
+let editandoCapacidadeId = null;
+
+/**
+ * Carrega as capacidades do banco de dados.
+ */
 async function carregarCapacidades() {
   try {
     const { data, error } = await getSupa()
@@ -55,6 +59,20 @@ function atualizarSelectCapacidade(lista) {
   select.value = valorAtual;
 }
 
+/**
+ * Fecha o modal de gerenciamento de capacidades.
+ */
+function fecharModalCapacidade() {
+  const modal = document.getElementById("modalCapacidade");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
+/**
+ * Seleciona uma capacidade da lista para o formulário principal.
+ */
 function selecionarCapacidade(nome) {
   const select = document.getElementById("capacidade");
   if (select) {
@@ -74,20 +92,26 @@ function selecionarCapacidade(nome) {
   fecharModalCapacidade();
 }
 
+/**
+ * Salva ou Atualiza uma capacidade no banco de dados.
+ */
 async function salvarCapacidade() {
   const input = document.getElementById("novoCapacidadeNome");
+  if (!input) return;
+
   const nome = input.value.toUpperCase().trim();
   if (!nome) return;
 
   const supa = getSupa();
-  if (window.editandoCapacidadeId) {
+  if (editandoCapacidadeId) {
     const { error } = await supa
       .from("capacidades")
       .update({ nome })
-      .eq("id", window.editandoCapacidadeId);
+      .eq("id", editandoCapacidadeId);
     if (!error) {
-      window.editandoCapacidadeId = null;
-      document.getElementById("btnSalvarCapacidade").innerText = "ADICIONAR";
+      editandoCapacidadeId = null;
+      if (document.getElementById("btnSalvarCapacidade"))
+        document.getElementById("btnSalvarCapacidade").innerText = "ADICIONAR";
       input.value = "";
       carregarCapacidades();
     }
@@ -101,7 +125,7 @@ async function salvarCapacidade() {
 }
 
 function prepararEdicaoCapacidade(id, nome) {
-  window.editandoCapacidadeId = id;
+  editandoCapacidadeId = id;
   const input = document.getElementById("novoCapacidadeNome");
   input.value = nome;
   input.focus();
@@ -115,19 +139,19 @@ async function deletarCapacidade(id) {
   }
 }
 
-window.abrirModalCapacidade = () => {
+function abrirModalCapacidade() {
   const modal = document.getElementById("modalCapacidade");
-  modal?.classList.remove("hidden");
-  modal?.classList.add("flex");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
   carregarCapacidades();
-};
-window.fecharModalCapacidade = () => {
-  document.getElementById("modalCapacidade")?.classList.add("hidden");
-  document.getElementById("modalCapacidade")?.classList.remove("flex");
-};
+}
 
 window.carregarCapacidades = carregarCapacidades;
 window.salvarCapacidade = salvarCapacidade;
 window.selecionarCapacidade = selecionarCapacidade;
 window.prepararEdicaoCapacidade = prepararEdicaoCapacidade;
 window.deletarCapacidade = deletarCapacidade;
+window.abrirModalCapacidade = abrirModalCapacidade;
+window.fecharModalCapacidade = fecharModalCapacidade;

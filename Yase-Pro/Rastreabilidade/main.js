@@ -208,5 +208,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.logout = logout;
-// Configuração do Supabase (YaSe PRO)
-// Configuração do Supabase
