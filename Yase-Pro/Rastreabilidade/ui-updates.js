@@ -1,22 +1,27 @@
 // ui-updates.js - FUNÇÃO COMPLETA
 
-// Garante acesso ao cliente Supabase global
-const _supabase = window._supabase;
-
 // Inicia e escuta mudanças
 window.addEventListener("load", () => {
-  sincronizarPainelSelos();
+  // Espera o Supabase estar disponível
+  const iniciarSincronizacao = () => {
+    if (window._supabase) {
+      sincronizarPainelSelos();
 
-  _supabase
-    .channel("mudanca_selos")
-    .on(
-      "postgres_changes",
-      { event: "INSERT", schema: "public", table: "itens_os" },
-      () => {
-        setTimeout(sincronizarPainelSelos, 500);
-      },
-    )
-    .subscribe();
+      window._supabase
+        .channel("mudanca_selos")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "itens_os" },
+          () => {
+            setTimeout(sincronizarPainelSelos, 500);
+          },
+        )
+        .subscribe();
+    } else {
+      setTimeout(iniciarSincronizacao, 500);
+    }
+  };
+  iniciarSincronizacao();
 });
 
 // Função para abrir o modal de componentes

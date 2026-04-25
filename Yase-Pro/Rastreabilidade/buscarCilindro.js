@@ -1,15 +1,15 @@
-const getSupabase = () =>
-  window._supabase ||
-  window.supabase.createClient(
-    "https://gzojpxgpgjapsegerscb.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s",
-  );
+const getSupabase = () => window._supabase || null;
 
 /**
  * Busca informações técnicas de um cilindro no banco de dados.
  */
 async function buscarCilindro() {
   const _supabase = getSupabase();
+  if (!_supabase) {
+    alert("Sistema não conectado. Aguarde um momento e tente novamente.");
+    return;
+  }
+
   const nrCilindro = document.getElementById("nr_cilindro").value.trim();
   const osAtual = document.getElementById("osBadgeNumber").innerText;
 

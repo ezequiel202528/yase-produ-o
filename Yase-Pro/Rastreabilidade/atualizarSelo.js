@@ -1,14 +1,30 @@
 /**
  * Sincronização do Contador de Selos em Tempo Real
  */
-const getSupa = () => window._supabase || window.supabase;
-const _supabase = getSupa();
+const getSupa = () => window._supabase || null;
+
+// Função para obter o cliente Supabase de forma segura
+function obterSupabase() {
+  const supabase = getSupa();
+  if (!supabase) {
+    console.warn("⏳ Supabase ainda não disponível em sincronizarPainelSelos");
+    return null;
+  }
+  return supabase;
+}
 
 /**
  * Consulta o banco de dados para encontrar o lote de selos aberto e o próximo número disponível.
  * Atualiza o painel visual de selos na interface.
  */
 async function sincronizarPainelSelos() {
+  const _supabase = obterSupabase();
+  if (!_supabase) {
+    // Tenta novamente em 500ms
+    setTimeout(sincronizarPainelSelos, 500);
+    return;
+  }
+
   const elLote = document.getElementById("lote_documento");
   const elSeloProx = document.getElementById("proximo_selo_num");
   const elQtd = document.getElementById("qtd_restante_texto");

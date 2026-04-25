@@ -1,6 +1,11 @@
 async function gerarRelatorioSaida() {
   // Busca as referências no momento do clique, garantindo que o banco já carregou
-  const _supabase = window._supabase;
+  const _supabase = window._supabase || null;
+  if (!_supabase) {
+    alert("Sistema não conectado. Aguarde um momento e tente novamente.");
+    return;
+  }
+
   const currentOS = window.currentOS;
 
   const { data: itens, error } = await _supabase

@@ -11,8 +11,16 @@ async function carregarItens() {
     // Aguarda um instante se o supabase ainda não estiver pronto (comum no Vercel)
     if (!window._supabase) {
       console.warn("⏳ Aguardando inicialização do Supabase...");
-      setTimeout(carregarItens, 500);
-      return;
+      // Aguarda até 5 segundos pelo Supabase
+      let tentativas = 0;
+      while (!window._supabase && tentativas < 20) {
+        await new Promise((r) => setTimeout(r, 250));
+        tentativas++;
+      }
+      if (!window._supabase) {
+        console.error("❌ Supabase não disponível após espera");
+        return;
+      }
     }
     const _supabase = window._supabase;
 
@@ -22,20 +30,36 @@ async function carregarItens() {
       return;
     }
 
-    const { data, error } = await _supabase
+    // Tentativa de busca com Join de fabricantes
+    let query = _supabase
       .from("itens_os")
-      .select(
-        `
-        *,
-        fabricantes (nome)
-      `,
-      )
+      .select("*, fabricantes(nome)")
       .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
-    if (error) throw error;
+    let { data, error } = await query;
 
-    console.log(`📊 Itens carregados para OS ${osAtiva}:`, data?.length || 0);
+    // Se der erro no Join (comum se a FK não estiver configurada), tenta busca simples
+    if (error) {
+      console.warn(
+        "⚠️ Falha na busca com relacionamento, tentando busca simples...",
+        error.message,
+      );
+      const simples = await _supabase
+        .from("itens_os")
+        .select("*")
+        .eq("os_number", osAtiva)
+        .order("created_at", { ascending: true });
+
+      if (simples.error) throw simples.error;
+      data = simples.data;
+    }
+
+    if (!data || data.length === 0) {
+      console.log(`ℹ️ Nenhum item encontrado para a OS ${osAtiva}`);
+    } else {
+      console.log(`📊 ${data.length} itens carregados com sucesso.`);
+    }
 
     const contadorEl = document.getElementById("itemCounter");
     if (contadorEl) contadorEl.innerText = data ? data.length : 0;

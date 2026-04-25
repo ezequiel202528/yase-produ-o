@@ -1,5 +1,7 @@
 // Garante acesso ao cliente Supabase global
-const _supabase = window._supabase;
+function obterSupabase() {
+  return window._supabase || null;
+}
 
 let idParaInutilizar = null;
 
@@ -15,6 +17,12 @@ function fecharModalInutilizar() {
 }
 
 async function confirmarInutilizacao() {
+  const _supabase = obterSupabase();
+  if (!_supabase) {
+    alert("Sistema não conectado. Aguarde um momento e tente novamente.");
+    return;
+  }
+
   const motivo = document.getElementById("motivoReprovacao").value;
 
   if (!motivo) {

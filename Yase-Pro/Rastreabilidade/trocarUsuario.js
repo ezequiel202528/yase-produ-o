@@ -1,5 +1,7 @@
 // Garante acesso ao cliente Supabase global
-const _supabase = window._supabase;
+function obterSupabase() {
+  return window._supabase || null;
+}
 
 function abrirModalTrocaUsuario() {
   document.getElementById("modalTrocaUsuario").classList.remove("hidden");
@@ -15,6 +17,12 @@ function fecharModalTrocaUsuario() {
 }
 
 async function confirmarTrocaUsuario() {
+  const _supabase = obterSupabase();
+  if (!_supabase) {
+    alert("Sistema não conectado. Aguarde um momento e tente novamente.");
+    return;
+  }
+
   const codigo = document.getElementById("troca_codigo").value;
   const senha = document.getElementById("troca_senha").value;
   const btn = document.getElementById("btnConfirmarTroca");
@@ -40,11 +48,16 @@ async function confirmarTrocaUsuario() {
     }
 
     // Atualiza a interface sem recarregar
-    document.getElementById("nome-operador-logado").innerText =
-      data.nome_completo.toUpperCase();
+    const displayElement = document.getElementById("nome-operador-logado");
+    if (displayElement) {
+      displayElement.innerText = data.nome_completo.toUpperCase();
+    }
 
     // Opcional: Salvar no localStorage para manter após o refresh se desejar
-    localStorage.setItem("operador_logado", data.nome_completo);
+    localStorage.setItem("nome_operador", data.nome_completo);
+
+    // Atualiza a variável global para que o sistema reconheça a troca imediatamente
+    window.nomeOperadorLogado = data.nome_completo;
 
     fecharModalTrocaUsuario();
 

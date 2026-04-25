@@ -157,8 +157,10 @@
  * Edição, Exclusão e Sincronização em Tempo Real
  */
 
-// Garante acesso ao cliente Supabase global
-const _supabase = window._supabase;
+// Função para obter o cliente Supabase de forma segura
+function obterSupabase() {
+  return window._supabase || null;
+}
 
 // Variável global para controlar se estamos editando um item existente
 window.editandoID = null;
@@ -167,6 +169,12 @@ window.editandoID = null;
  * PREPARAR EDIÇÃO: Busca dados no Supabase e preenche o formulário
  */
 async function prepararEdicao(id) {
+  const _supabase = obterSupabase();
+  if (!_supabase) {
+    alert("Sistema não conectado. Aguarde um momento e tente novamente.");
+    return;
+  }
+
   try {
     const { data, error } = await _supabase
       .from("itens_os")
@@ -265,6 +273,12 @@ window.deletarItem = async function (id) {
  * Executa a exclusão definitiva de um item no Supabase e atualiza a interface.
  */
 async function executarExclusao(id) {
+  const _supabase = obterSupabase();
+  if (!_supabase) {
+    alert("Sistema não conectado. Aguarde um momento e tente novamente.");
+    return;
+  }
+
   try {
     const { error } = await _supabase.from("itens_os").delete().eq("id", id);
     if (error) throw error;

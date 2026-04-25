@@ -2,15 +2,74 @@ const SUPABASE_URL = "https://gzojpxgpgjapsegerscb.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s";
 
-// Inicialização imediata do cliente global
-window._supabase =
-  window._supabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const _supabase = window._supabase;
+// Função para aguardar o Supabase estar disponível
+function aguardarSupabase(retries = 20) {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+    const check = () => {
+      attempts++;
+      if (window.supabase && window.supabase.createClient) {
+        resolve(true);
+      } else if (attempts >= retries) {
+        console.error("❌ Supabase não carregou após", retries, "tentativas");
+        reject(new Error("Supabase não disponível"));
+      } else {
+        setTimeout(check, 250);
+      }
+    };
+    check();
+  });
+}
+
+// Inicialização do cliente global - só executa após Supabase estar disponível
+let _supabase = null;
+
+async function inicializarSupabase() {
+  try {
+    await aguardarSupabase();
+    window._supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    _supabase = window._supabase;
+
+    // Inicializa o listener de tempo real após a criação do cliente para evitar erros
+    inicializarRealtime();
+
+    console.log("✅ Supabase inicializado com sucesso");
+    return true;
+  } catch (err) {
+    console.error("❌ Falha ao inicializar Supabase:", err);
+    return false;
+  }
+}
+
+// Função para escutar mudanças no banco em tempo real de forma segura
+function inicializarRealtime() {
+  if (window._supabase) {
+    window._supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "itens_os" },
+        (payload) => {
+          console.log("🔔 Mudança detectada no Supabase!", payload);
+          const fnCarregar = window.carregarItens || window.loadItens;
+          if (typeof fnCarregar === "function") {
+            fnCarregar();
+          }
+        },
+      )
+      .subscribe();
+    console.log("✅ Realtime listener ativado para tabela itens_os");
+  }
+}
 
 // Captura imediata da OS ativa para evitar atrasos na renderização
 const urlParams = new URLSearchParams(window.location.search);
-window.currentOS =
+
+// Garantimos que a OS seja tratada como String ou Número conforme o banco espera
+const osBruta =
   urlParams.get("os") || sessionStorage.getItem("currentOS") || "1";
+window.currentOS = osBruta;
+
 if (window.currentOS) sessionStorage.setItem("currentOS", window.currentOS);
 
 const nomeOperadorLogado = localStorage.getItem("nome_operador") || "Sistema";
@@ -24,7 +83,18 @@ window.editandoID = null;
  */
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("🚀 Iniciando carregamento de Rastreabilidade...");
-  console.log("✅ Supabase inicializado:", _supabase ? "SIM" : "NÃO");
+
+  // Inicializa o Supabase primeiro
+  const supabaseInicializado = await inicializarSupabase();
+  console.log(
+    "✅ Supabase inicializado:",
+    supabaseInicializado ? "SIM" : "NÃO",
+  );
+
+  if (!supabaseInicializado) {
+    console.error("🛑 Sistema interrompido: Supabase não inicializou.");
+    return;
+  }
 
   console.log("📋 OS Atual:", window.currentOS);
 
@@ -93,24 +163,6 @@ if (tipoCargaElement) {
     if (titulo) titulo.innerText = "Pesagem " + valor;
   });
 }
-
-// Escuta mudanças no banco em tempo real
-_supabase
-  .channel("custom-all-channel")
-  .on(
-    "postgres_changes",
-    { event: "*", schema: "public", table: "itens_os" },
-    (payload) => {
-      console.log("🔔 Mudança detectada no Supabase!", payload);
-      const fnCarregar = window.carregarItens || window.loadItens;
-      if (typeof fnCarregar === "function") {
-        fnCarregar();
-      }
-    },
-  )
-  .subscribe();
-
-console.log("✅ Realtime listener ativado para tabela itens_os");
 
 document.addEventListener("DOMContentLoaded", () => {
   const nomeOperador = localStorage.getItem("nome_operador");

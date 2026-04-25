@@ -1,4 +1,4 @@
-const getSupa = () => window._supabase || window.supabase;
+const getSupa = () => window._supabase || null;
 
 /**
  * Renderiza a lista de fabricantes no container HTML do modal.
@@ -24,8 +24,15 @@ function renderizarListaFabricantes(lista) {
  * Busca a lista de fabricantes do Supabase e renderiza no modal
  */
 async function carregarFabricantes() {
+  const supabase = getSupa();
+  if (!supabase) {
+    console.warn("⏳ Supabase não disponível ainda");
+    setTimeout(carregarFabricantes, 500);
+    return;
+  }
+
   try {
-    const { data, error } = await getSupa()
+    const { data, error } = await supabase
       .from("fabricantes")
       .select("id, nome")
       .order("id", { ascending: true });
