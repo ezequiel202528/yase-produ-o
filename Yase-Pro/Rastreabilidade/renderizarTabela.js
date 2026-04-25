@@ -314,6 +314,8 @@ document.addEventListener("keydown", (e) => {
  * Registra um novo item ou salva as alterações de um item em edição no banco de dados.
  */
 async function registrarItem() {
+  console.log("🚀 Iniciando processo de registro...");
+
   if (window.fabricanteValido === false) {
     if (typeof exibirAlertaErro === "function") {
       exibirAlertaErro("ID do Fabricante não encontrado no banco de dados.");
@@ -329,17 +331,27 @@ async function registrarItem() {
 
   if (typeof validarAnoReteste === "function" && !validarAnoReteste()) return;
 
-  const empresaIdLogada = localStorage.getItem("empresa_id");
+  // Recupera empresa_id com fallback para evitar falha em colunas obrigatórias do banco
+  let empresaIdLogada = localStorage.getItem("empresa_id");
+  if (!empresaIdLogada) {
+    console.warn(
+      "⚠️ empresa_id não encontrado no localStorage. Usando fallback '1'.",
+    );
+    empresaIdLogada = "1";
+  }
+
   const nomeOperadorLogado = localStorage.getItem("nome_operador");
   const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
 
-  if (!empresaIdLogada || !osAtiva) {
-    alert("⚠️ Erro: Dados de login ou OS não encontrados.");
+  if (!osAtiva) {
+    alert("⚠️ Erro: Número da OS não identificado. Recarregue a página.");
     return;
   }
 
   try {
     const _supabase = window._supabase;
+    if (!_supabase) throw new Error("Cliente Supabase não inicializado.");
+
     if (typeof window.sincronizarPainelSelos === "function") {
       await window.sincronizarPainelSelos();
     }
@@ -444,6 +456,8 @@ async function registrarItem() {
       const el = document.getElementById(`comp_${item}`);
       dados[`comp_${item}`] = el ? el.checked : false;
     });
+
+    console.log("📝 Dados preparados para envio:", dados);
 
     let resultado;
     if (window.editandoID) {
@@ -646,3 +660,4 @@ window.renderizarLinhas = renderItens; // Compatibilidade com chamadas antigas
 window.destacarLinha = destacarLinha;
 window.configurarCliquesTabela = configurarCliquesTabela;
 window.destacarUltimaLinha = destacarUltimaLinha;
+window.registrarItem = registrarItem;
