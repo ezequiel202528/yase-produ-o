@@ -58,6 +58,26 @@ function atualizarSelectNBR(lista) {
 function selecionarNBR(nome) {
   const select = document.getElementById("nbr_select");
   if (select) select.value = nome;
+  if (select) {
+    select.value = nome;
+
+    // Remove estados de erro e aplica feedback visual de sucesso
+    select.classList.remove("input-error-shake", "border-red-500");
+    select.classList.add("border-emerald-500", "ring-2", "ring-emerald-500/20");
+
+    // Dispara o evento de mudança para atualizar o estado interno do sistema
+    select.dispatchEvent(new Event("change"));
+
+    setTimeout(() => {
+      select.classList.remove(
+        "border-emerald-500",
+        "ring-2",
+        "ring-emerald-500/20",
+      );
+    }, 1000);
+
+    console.log(`✅ NBR selecionada com sucesso: ${nome}`);
+  }
   fecharModalNBR();
 }
 
@@ -114,6 +134,7 @@ export function fecharModalNBR() {
   document.getElementById("btnSalvarNBR").innerText = "ADICIONAR";
 }
 
+window.carregarNBRs = carregarNBRs;
 window.abrirModalNBR = abrirModalNBR;
 window.fecharModalNBR = fecharModalNBR;
 window.salvarNBR = salvarNBR;

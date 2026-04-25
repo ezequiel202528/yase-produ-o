@@ -45,20 +45,39 @@ async function inicializarSupabase() {
 function inicializarRealtime() {
   if (window._supabase) {
     window._supabase
-      .channel("custom-all-channel")
+      .channel("db-changes")
+      // Monitora itens da OS
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "itens_os" },
         (payload) => {
-          console.log("🔔 Mudança detectada no Supabase!", payload);
-          const fnCarregar = window.carregarItens || window.loadItens;
-          if (typeof fnCarregar === "function") {
-            fnCarregar();
-          }
+          console.log("🔔 Mudança em itens_os detectada");
+          const fn = window.carregarItens || window.loadItens;
+          if (typeof fn === "function") fn();
+        },
+      )
+      // Monitora novas Normas NBR
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "nbr" },
+        () => {
+          console.log("🔔 Nova NBR detectada");
+          if (typeof window.carregarNBRs === "function") window.carregarNBRs();
+        },
+      )
+      // Monitora novos Tipos de Carga
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tipos_carga" },
+        () => {
+          console.log("🔔 Novo Tipo de Carga detectado");
+          if (typeof window.carregarTipos === "function")
+            window.carregarTipos();
         },
       )
       .subscribe();
-    console.log("✅ Realtime listener ativado para tabela itens_os");
+
+    console.log("✅ Realtime listener ativado para múltiplas tabelas");
   }
 }
 
@@ -136,6 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (typeof window.sincronizarPainelSelos === "function")
     await window.sincronizarPainelSelos();
   if (typeof window.carregarTipos === "function") await window.carregarTipos();
+  if (typeof window.carregarNBRs === "function") await window.carregarNBRs();
 
   setTimeout(() => {
     if (typeof focarUltimoRegistro === "function") {
