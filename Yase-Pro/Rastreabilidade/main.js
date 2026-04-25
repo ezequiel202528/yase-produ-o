@@ -2,19 +2,20 @@ const SUPABASE_URL = "https://gzojpxgpgjapsegerscb.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2pweGdwZ2phcHNlZ2Vyc2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4Nzc2MzUsImV4cCI6MjA4NTQ1MzYzNX0.vSaIuKyEuzNEGxFsawugLwtUpwWqYpCMP_a3JfWrY5s";
 
-if (!window._supabase) {
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY,
-  );
-  window._supabase = supabaseClient;
-}
+// Inicialização imediata do cliente global
+window._supabase =
+  window._supabase || window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const _supabase = window._supabase;
+
+// Captura imediata da OS ativa para evitar atrasos na renderização
+const urlParams = new URLSearchParams(window.location.search);
+window.currentOS =
+  urlParams.get("os") || sessionStorage.getItem("currentOS") || "1";
+if (window.currentOS) sessionStorage.setItem("currentOS", window.currentOS);
 
 const nomeOperadorLogado = localStorage.getItem("nome_operador") || "Sistema";
 window.nomeOperadorLogado = nomeOperadorLogado;
 
-window.currentOS = "";
 window.selectedLevel = 1;
 window.editandoID = null;
 
@@ -24,10 +25,6 @@ window.editandoID = null;
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("🚀 Iniciando carregamento de Rastreabilidade...");
   console.log("✅ Supabase inicializado:", _supabase ? "SIM" : "NÃO");
-
-  const urlParams = new URLSearchParams(window.location.search);
-  window.currentOS =
-    urlParams.get("os") || sessionStorage.getItem("currentOS") || "1";
 
   console.log("📋 OS Atual:", window.currentOS);
 

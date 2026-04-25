@@ -8,16 +8,24 @@ let selectedRowIndex = -1;
  */
 async function carregarItens() {
   try {
+    // Aguarda um instante se o supabase ainda não estiver pronto (comum no Vercel)
+    if (!window._supabase) {
+      console.warn("⏳ Aguardando inicialização do Supabase...");
+      setTimeout(carregarItens, 500);
+      return;
+    }
     const _supabase = window._supabase;
-    if (!_supabase) return;
 
     const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
-    if (!osAtiva) return;
+    if (!osAtiva) {
+      console.error("❌ Nenhuma OS ativa encontrada para carregar dados.");
+      return;
+    }
 
     const { data, error } = await _supabase
       .from("itens_os")
       .select("*, fabricantes!fabricante_id(nome)")
-      .eq("os_number", osAtiva)
+      .or(`os_number.eq.${osAtiva},os_number.eq.${parseInt(osAtiva) || 0}`) // Tenta string e número
       .order("created_at", { ascending: true });
 
     if (error) throw error;

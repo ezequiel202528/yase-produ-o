@@ -21,7 +21,7 @@ async function buscarCilindro() {
   try {
     // 1. Tenta buscar na OS Atual primeiro para evitar duplicidade ou permitir edição
     const { data: itemLocal } = await _supabase
-      .from("itens_rastreio") // Nome da sua tabela no Supabase
+      .from("itens_os")
       .select("*")
       .eq("nr_cilindro", nrCilindro)
       .eq("os_vinculada", osAtual)
@@ -35,7 +35,7 @@ async function buscarCilindro() {
 
     // 2. Se não achou na atual, busca em todo o histórico (Global)
     const { data: itemGlobal } = await _supabase
-      .from("itens_rastreio")
+      .from("itens_os")
       .select("os_vinculada, data_lancamento")
       .eq("nr_cilindro", nrCilindro)
       .order("data_lancamento", { ascending: false })
