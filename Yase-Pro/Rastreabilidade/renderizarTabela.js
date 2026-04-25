@@ -316,6 +316,30 @@ document.addEventListener("keydown", (e) => {
 async function registrarItem() {
   console.log("🚀 Iniciando processo de registro...");
 
+  // 1. Validação de Campos Obrigatórios
+  const camposObrigatorios = [
+    { id: "X_input_id", label: "Fabricante" },
+    { id: "nr_cilindro", label: "Número do Cilindro" },
+    { id: "ano_fab", label: "Ano de Fabricação" },
+    { id: "ult_reteste", label: "Último Reteste" },
+    { id: "tipo_carga", label: "Tipo de Carga" },
+    { id: "capacidade", label: "Capacidade" },
+    { id: "nbr_select", label: "Norma NBR" }
+  ];
+
+  for (const campo of camposObrigatorios) {
+    const el = document.getElementById(campo.id);
+    if (!el || !el.value.trim()) {
+      alert(`⚠️ O campo "${campo.label}" não foi preenchido e é obrigatório.`);
+      if (el) {
+        el.focus();
+        el.classList.add("input-error-shake");
+        setTimeout(() => el.classList.remove("input-error-shake"), 2000);
+      }
+      return; // Interrompe o processo de registro aqui
+    }
+  }
+
   if (window.fabricanteValido === false) {
     if (typeof exibirAlertaErro === "function") {
       exibirAlertaErro("ID do Fabricante não encontrado no banco de dados.");
