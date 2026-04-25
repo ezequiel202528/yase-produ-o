@@ -54,9 +54,9 @@ function X_ABRIR_TIPO() {
 }
 
 function openCapacidadeModal() {
-  alert(
-    "Funcionalidade de busca de Capacidades será implementada na próxima versão.",
-  );
+  if (typeof window.abrirModalCapacidade === "function") {
+    window.abrirModalCapacidade();
+  }
 }
 
 function X_ABRIR_NBR() {
