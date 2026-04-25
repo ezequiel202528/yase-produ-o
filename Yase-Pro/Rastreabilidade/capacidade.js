@@ -121,9 +121,10 @@ window.abrirModalCapacidade = () => {
   modal?.classList.add("flex");
   carregarCapacidades();
 };
-window.fecharModalCapacidade = () =>
-  document.getElementById("modalCapacidade")?.classList.add("hidden") ||
+window.fecharModalCapacidade = () => {
+  document.getElementById("modalCapacidade")?.classList.add("hidden");
   document.getElementById("modalCapacidade")?.classList.remove("flex");
+};
 
 window.carregarCapacidades = carregarCapacidades;
 window.salvarCapacidade = salvarCapacidade;
