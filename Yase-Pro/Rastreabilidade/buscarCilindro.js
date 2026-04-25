@@ -24,7 +24,7 @@ async function buscarCilindro() {
       .from("itens_os")
       .select("*")
       .eq("nr_cilindro", nrCilindro)
-      .eq("os_vinculada", osAtual)
+      .eq("os_number", osAtual)
       .single();
 
     if (itemLocal) {
@@ -36,15 +36,15 @@ async function buscarCilindro() {
     // 2. Se não achou na atual, busca em todo o histórico (Global)
     const { data: itemGlobal } = await _supabase
       .from("itens_os")
-      .select("os_vinculada, data_lancamento")
+      .select("os_number, created_at")
       .eq("nr_cilindro", nrCilindro)
-      .order("data_lancamento", { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(1)
       .single();
 
     if (itemGlobal) {
       alert(
-        `Cilindro encontrado na OS: ${itemGlobal.os_vinculada}\nData do último registro: ${new Date(itemGlobal.data_lancamento).toLocaleDateString()}`,
+        `Cilindro encontrado na OS: ${itemGlobal.os_number}\nData do último registro: ${new Date(itemGlobal.created_at).toLocaleDateString()}`,
       );
     } else {
       alert("Cilindro não encontrado em nenhuma Ordem de Serviço.");

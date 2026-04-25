@@ -24,8 +24,13 @@ async function carregarItens() {
 
     const { data, error } = await _supabase
       .from("itens_os")
-      .select("*, fabricantes!fabricante_id(nome)")
-      .or(`os_number.eq.${osAtiva},os_number.eq.${parseInt(osAtiva) || 0}`) // Tenta string e número
+      .select(
+        `
+        *,
+        fabricantes (nome)
+      `,
+      )
+      .eq("os_number", osAtiva)
       .order("created_at", { ascending: true });
 
     if (error) throw error;
