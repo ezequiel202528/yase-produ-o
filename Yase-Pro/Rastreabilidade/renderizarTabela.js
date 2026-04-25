@@ -324,13 +324,18 @@ async function registrarItem() {
     { id: "ult_reteste", label: "Último Reteste" },
     { id: "tipo_carga", label: "Tipo de Carga" },
     { id: "capacidade", label: "Capacidade" },
-    { id: "nbr_select", label: "Norma NBR" }
+    { id: "nbr_select", label: "Norma NBR" },
   ];
 
   for (const campo of camposObrigatorios) {
     const el = document.getElementById(campo.id);
     if (!el || !el.value.trim()) {
-      alert(`⚠️ O campo "${campo.label}" não foi preenchido e é obrigatório.`);
+      if (typeof window.exibirAlertaErro === "function") {
+        window.exibirAlertaErro(`O campo "${campo.label}" é obrigatório.`);
+      } else {
+        alert(`⚠️ O campo "${campo.label}" não foi preenchido.`);
+      }
+
       if (el) {
         el.focus();
         el.classList.add("input-error-shake");
@@ -368,7 +373,13 @@ async function registrarItem() {
   const osAtiva = window.currentOS || sessionStorage.getItem("currentOS");
 
   if (!osAtiva) {
-    alert("⚠️ Erro: Número da OS não identificado. Recarregue a página.");
+    if (typeof window.exibirAlertaErro === "function") {
+      window.exibirAlertaErro(
+        "Número da OS não identificado. Recarregue a página.",
+      );
+    } else {
+      alert("⚠️ Erro: Número da OS não identificado.");
+    }
     return;
   }
 
@@ -437,9 +448,11 @@ async function registrarItem() {
     // Lógica de Selo: Apenas para NOVOS registros
     if (!window.editandoID) {
       if (!window.proximoSeloCalculado) {
-        alert(
-          "⚠️ Não há selos disponíveis ou o lote não foi carregado. Verifique o painel de selos.",
-        );
+        if (typeof window.exibirAlertaErro === "function") {
+          window.exibirAlertaErro("Lote de selos não carregado ou esgotado.");
+        } else {
+          alert("⚠️ Não há selos disponíveis.");
+        }
         return;
       }
 
@@ -508,7 +521,13 @@ async function registrarItem() {
     }
   } catch (err) {
     console.error("Erro no salvamento:", err);
-    alert("Erro ao salvar: " + (err.message || "Erro desconhecido."));
+    if (typeof window.exibirAlertaErro === "function") {
+      window.exibirAlertaErro(
+        "Erro ao salvar: " + (err.message || "Erro desconhecido."),
+      );
+    } else {
+      alert("Erro ao salvar: " + (err.message || "Erro desconhecido."));
+    }
   }
 }
 
