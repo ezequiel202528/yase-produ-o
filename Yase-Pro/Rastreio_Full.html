@@ -607,6 +607,41 @@
     </div>
 </div>
 
+<!-- Modal Capacidade -->
+<div id="modalCapacidade" class="fixed inset-0 z-[10005] hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fa-solid fa-weight-scale text-amber-500"></i>
+                <h3 class="text-white font-black uppercase text-sm tracking-widest">Capacidades Registradas</h3>
+            </div>
+            
+            <div class="flex gap-2 mb-6 bg-slate-800/50 p-2 rounded-2xl border border-slate-700/50">
+                <input type="text" id="novoCapacidadeNome" class="flex-1 bg-transparent px-3 text-white text-xs outline-none uppercase" placeholder="Nova Capacidade (Ex: 6KG)...">
+                <button id="btnSalvarCapacidade" onclick="salvarCapacidade()" class="bg-amber-500 text-slate-900 px-4 py-2 rounded-xl font-black text-[10px] hover:bg-amber-400 transition-all">
+                    ADICIONAR
+                </button>
+            </div>
+
+            <div class="relative mb-4">
+                <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-500 text-[10px]"></i>
+                </div>
+                <input type="text" id="filtroCapacidade" onkeyup="filtrarCapacidades()" 
+                    class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 pl-9 pr-4 text-white text-[11px] focus:ring-1 focus:ring-amber-500 outline-none transition-all placeholder:text-slate-600" 
+                    placeholder="Pesquisar capacidade...">
+            </div>
+
+            <div id="listaCapacidades" class="custom-scroll-fab space-y-2 pr-2">
+                <!-- Lista renderizada via JS -->
+            </div>
+
+            <div class="mt-6">
+                <button onclick="fecharModalCapacidade()" class="w-full py-3 bg-slate-800 text-slate-400 rounded-xl text-[10px] font-black uppercase border border-slate-700 hover:bg-slate-700 transition-all">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="modalBuscaCilindro" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
     <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">

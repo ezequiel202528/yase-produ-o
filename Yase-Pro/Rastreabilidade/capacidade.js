@@ -155,3 +155,11 @@ window.prepararEdicaoCapacidade = prepararEdicaoCapacidade;
 window.deletarCapacidade = deletarCapacidade;
 window.abrirModalCapacidade = abrirModalCapacidade;
 window.fecharModalCapacidade = fecharModalCapacidade;
+window.filtrarCapacidades = () => {
+  const termo = document.getElementById("filtroCapacidade").value.toLowerCase();
+  const itens = document.getElementById("listaCapacidades").children;
+  for (let item of itens)
+    item.style.display = item.innerText.toLowerCase().includes(termo)
+      ? "flex"
+      : "none";
+};

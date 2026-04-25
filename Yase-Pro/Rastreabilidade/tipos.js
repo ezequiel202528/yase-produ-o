@@ -134,13 +134,6 @@ window.abrirModalTipo = () => {
 window.fecharModalTipo = () =>
   document.getElementById("modalTipo")?.classList.add("hidden") ||
   document.getElementById("modalTipo")?.classList.remove("flex");
-window.fecharModalTipo = () => {
-  const modal = document.getElementById("modalTipo");
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  }
-};
 
 window.carregarTipos = carregarTipos;
 window.salvarTipo = salvarTipo;
