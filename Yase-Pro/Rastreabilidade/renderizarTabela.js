@@ -22,6 +22,8 @@ async function carregarItens() {
 
     if (error) throw error;
 
+    console.log(`📊 Itens carregados para OS ${osAtiva}:`, data?.length || 0);
+
     const contadorEl = document.getElementById("itemCounter");
     if (contadorEl) contadorEl.innerText = data ? data.length : 0;
 
@@ -597,6 +599,7 @@ window.fixData = fixData;
 window.carregarItens = carregarItens;
 window.focarUltimoRegistro = focarUltimoRegistro;
 window.renderItens = renderItens;
+window.renderizarLinhas = renderItens; // Compatibilidade com chamadas antigas
 window.destacarLinha = destacarLinha;
 window.configurarCliquesTabela = configurarCliquesTabela;
 window.destacarUltimaLinha = destacarUltimaLinha;

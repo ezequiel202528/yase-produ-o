@@ -52,36 +52,6 @@ async function confirmarInutilizacao() {
   }
 }
 
-// Dentro da sua função de renderização (ex: carregarItens ou renderizar)
-function renderizarLinhas(itens) {
-  const lista = document.getElementById("itensList");
-  lista.innerHTML = "";
-
-  itens.forEach((item) => {
-    // Define a pureza visual: se for Inutilizado, fica vermelho.
-    const classeInutilizado =
-      item.status === "Inutilizado"
-        ? "text-red-500 font-bold"
-        : "text-slate-300";
-
-    const tr = document.createElement("tr");
-    tr.className = `${classeInutilizado} border-b border-slate-800 hover:bg-slate-800/30 transition-colors`;
-
-    tr.innerHTML = `
-            <td class="p-3 sticky left-0 z-[50] bg-slate-900 border-r border-slate-800">${item.id}</td>
-            <td class="p-4">${item.num_selo || "---"}</td>
-            <td class="p-4 font-black">${item.status}</td>
-            <td class="p-4 text-right sticky right-0 bg-slate-900 border-l border-slate-800">
-                <button onclick="abrirModalInutilizar(${item.id})" class="text-red-500 hover:text-red-400">
-                    <i class="fa-solid fa-ban"></i>
-                </button>
-            </td>
-        `;
-    lista.appendChild(tr);
-  });
-}
-
 window.abrirModalInutilizar = abrirModalInutilizar;
 window.fecharModalInutilizar = fecharModalInutilizar;
 window.confirmarInutilizacao = confirmarInutilizacao;
-window.renderizarLinhas = renderizarLinhas;

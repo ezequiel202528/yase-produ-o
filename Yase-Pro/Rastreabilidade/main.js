@@ -59,7 +59,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   setTimeout(forcarLimpeza, 1500);
 
   console.log("📥 Carregando itens do Supabase...");
-  if (typeof window.carregarItens === "function") await window.carregarItens();
+  setTimeout(async () => {
+    if (typeof window.carregarItens === "function")
+      await window.carregarItens();
+  }, 500);
   if (typeof window.sincronizarPainelSelos === "function")
     await window.sincronizarPainelSelos();
   if (typeof window.carregarTipos === "function") await window.carregarTipos();
