@@ -704,3 +704,42 @@ window.destacarLinha = destacarLinha;
 window.configurarCliquesTabela = configurarCliquesTabela;
 window.destacarUltimaLinha = destacarUltimaLinha;
 window.registrarItem = registrarItem;
+
+// ============================================================
+// LÓGICA DE INSTALAÇÃO DO APLICATIVO (PWA) EM PORTUGUÊS
+// ============================================================
+
+let eventoInstalacao; // Guarda o convite de instalação do navegador
+
+/**
+ * Intercepta o aviso de instalação do navegador para que ele não apareça sozinho.
+ */
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Impede o Chrome/Edge de mostrar o botão cinza "Abrir no App" na URL
+    e.preventDefault();
+    
+    // Guarda o evento para usarmos quando o técnico clicar no botão "Instalar"
+    eventoInstalacao = e;
+    
+    // Localiza o botão de instalação no HTML e o torna visível
+    const botaoInstalar = document.getElementById('btnInstalarApp');
+    if (botaoInstalar) {
+        botaoInstalar.classList.remove('hidden');
+        botaoInstalar.style.display = 'flex';
+    }
+});
+
+/**
+ * Função disparada pelo botão de instalação no menu lateral.
+ */
+window.dispararInstalacao = async () => {
+    if (eventoInstalacao) {
+        // Abre a janelinha oficial do navegador perguntando se deseja instalar
+        eventoInstalacao.prompt();
+        
+        // Limpa a variável e esconde o botão após o uso
+        eventoInstalacao = null;
+        const botaoInstalar = document.getElementById('btnInstalarApp');
+        if (botaoInstalar) botaoInstalar.style.display = 'none';
+    }
+};
