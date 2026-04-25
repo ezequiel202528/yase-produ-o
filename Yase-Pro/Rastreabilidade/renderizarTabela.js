@@ -344,14 +344,6 @@ async function registrarItem() {
       await window.sincronizarPainelSelos();
     }
 
-    if (!window.proximoSeloCalculado && !window.editandoID) {
-      alert("⚠️ Sistema de controle de selos não inicializado.");
-      return;
-    }
-
-    const seloNumParaGravar = window.proximoSeloCalculado;
-    const prefixoParaGravar = window.prefixoAtualSelo;
-
     const limpar = (id, tipo = "text") => {
       const el = document.getElementById(id);
       if (!el) return null;
@@ -375,9 +367,6 @@ async function registrarItem() {
         : nomeOperadorLogado || "Sistema",
       usuario_alteracao: nomeOperadorLogado || "Sistema",
       updated_at: new Date().toISOString(),
-      selo_inmetro: seloNumParaGravar,
-      prefixo_selo: prefixoParaGravar,
-      cod_barras: "21" + seloNumParaGravar.toString().padStart(6, "0"),
       nr_cilindro: limpar("nr_cilindro"),
       num_patrimonio: limpar("N-Patrimonio") || limpar("pallet"),
       fabricante_id: limpar("X_input_id", "num"),
@@ -408,6 +397,23 @@ async function registrarItem() {
       deposito_galpao: limpar("deposito_galpao"),
       local_extintor: limpar("local_extintor"),
     };
+
+    // Lógica de Selo: Apenas para NOVOS registros
+    if (!window.editandoID) {
+      if (!window.proximoSeloCalculado) {
+        alert(
+          "⚠️ Não há selos disponíveis ou o lote não foi carregado. Verifique o painel de selos.",
+        );
+        return;
+      }
+
+      dados.selo_inmetro = window.proximoSeloCalculado;
+      dados.prefixo_selo = window.prefixoAtualSelo;
+
+      // Garante que o código de barras seja gerado sem erro de toString()
+      const seloStr = String(window.proximoSeloCalculado).padStart(6, "0");
+      dados.cod_barras = "21" + seloStr;
+    }
 
     const listaComp = [
       "pistola",
