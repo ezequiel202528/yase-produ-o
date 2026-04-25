@@ -76,9 +76,14 @@ function inicializarRealtime() {
         },
       )
       // Monitora novas Capacidades
-      .on("postgres_changes", { event: "*", schema: "public", table: "capacidades" }, () => {
-        console.log("🔔 Nova Capacidade detectada");
-        if (typeof window.carregarCapacidades === "function") window.carregarCapacidades();
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "capacidades" },
+        () => {
+          console.log("🔔 Nova Capacidade detectada");
+          if (typeof window.carregarCapacidades === "function")
+            window.carregarCapacidades();
+        },
       )
       .subscribe();
 
@@ -161,7 +166,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     await window.sincronizarPainelSelos();
   if (typeof window.carregarTipos === "function") await window.carregarTipos();
   if (typeof window.carregarNBRs === "function") await window.carregarNBRs();
-  if (typeof window.carregarCapacidades === "function") await window.carregarCapacidades();
+  if (typeof window.carregarCapacidades === "function")
+    await window.carregarCapacidades();
 
   setTimeout(() => {
     if (typeof focarUltimoRegistro === "function") {
