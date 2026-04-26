@@ -116,11 +116,25 @@ async function salvarComponentesNoModal() {
       .update(updateData)
       .eq("id", idTarget);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erro Supabase:", error);
+      throw error;
+    }
+
+    // Força a atualização da tabela para mostrar o badge/mudanças
+    if (typeof window.carregarItens === "function") {
+      await window.carregarItens();
+    }
+
+    console.log("✅ Componentes atualizados para o item:", idTarget);
     fecharModalComponentes();
   } catch (err) {
     console.error("Erro ao salvar componentes:", err);
-    alert("Erro ao salvar seleções.");
+    if (typeof window.exibirAlertaErro === "function") {
+      window.exibirAlertaErro("Falha ao salvar componentes no banco de dados.");
+    } else {
+      alert("Erro ao salvar seleções: " + (err.message || "Erro técnico"));
+    }
   }
 }
 
