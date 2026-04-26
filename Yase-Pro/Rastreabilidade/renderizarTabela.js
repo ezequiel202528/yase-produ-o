@@ -112,6 +112,17 @@ function focarUltimoRegistro() {
 }
 
 /**
+ * Monitora a digitação de um novo cilindro para limpar seleções anteriores.
+ * Isso garante que ao ir para o "37", o modal de componentes abra vazio.
+ */
+document.getElementById('nr_cilindro')?.addEventListener('input', () => {
+    if (!window.editandoID && window.idSelecionadoComponentes) {
+        window.idSelecionadoComponentes = null;
+        document.querySelectorAll(".row-highlight-active").forEach(el => el.classList.remove("row-highlight-active"));
+    }
+});
+
+/**
  * Gera o HTML dinâmico das linhas da tabela com base no array de itens fornecido.
  */
 function renderItens(itens) {
