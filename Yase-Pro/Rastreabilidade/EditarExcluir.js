@@ -211,6 +211,39 @@ async function prepararEdicao(id) {
       dvp_ep: data.dvp_ep,
     };
 
+    // Lista de componentes para restaurar o estado dos checkboxes no modal
+    const listaComp = [
+      "pistola",
+      "valvula",
+      "bucha",
+      "sifao",
+      "punho_pino",
+      "quebra_jato",
+      "manometro",
+      "mangueira",
+      "cord_plastico",
+      "saia_plastica",
+      "conj_apague",
+      "difusor",
+      "pera_ved",
+      "mola_rosca",
+      "conj_miolo",
+      "conj_haste",
+      "anel_oring",
+      "sifao_aluminio",
+      "conj_seguranca",
+      "haste_valvula",
+      "gancho_sup",
+      "trava_corrente",
+    ];
+
+    listaComp.forEach((item) => {
+      const el = document.getElementById(`comp_${item}`);
+      if (el) {
+        el.checked = data[`comp_${item}`] || false;
+      }
+    });
+
     if (data.fabricante_id) {
       window.buscarNomeFabricante(data.fabricante_id);
     }
@@ -237,6 +270,11 @@ async function prepararEdicao(id) {
 
     if (typeof calcularDatasAutomaticas === "function") {
       calcularDatasAutomaticas();
+    }
+
+    // Atualiza o badge de componentes após restaurar os checkboxes
+    if (typeof window.atualizarBadgeComponentes === "function") {
+      window.atualizarBadgeComponentes();
     }
 
     console.log("Modo de edição ativado para o ID:", id);
