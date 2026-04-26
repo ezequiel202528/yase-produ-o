@@ -28,7 +28,11 @@ async function buscarCilindro() {
       .single();
 
     if (itemLocal) {
-      preencherCampos(itemLocal);
+      if (typeof window.prepararEdicao === "function") {
+        await window.prepararEdicao(itemLocal.id);
+      } else {
+        preencherCampos(itemLocal);
+      }
       alert("Item encontrado nesta Ordem de Serviço.");
       return;
     }

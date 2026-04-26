@@ -187,6 +187,7 @@ async function prepararEdicao(id) {
     window.editandoID = id;
 
     const campos = {
+      cod_barras: data.cod_barras,
       X_input_id: data.fabricante_id,
       nr_cilindro: data.nr_cilindro,
       ano_fab: data.ano_fab,
@@ -199,7 +200,7 @@ async function prepararEdicao(id) {
       selo_anterior: data.selo_anterior,
       "N-Patrimonio": data.num_patrimonio,
       deposito_galpao: data.deposito_galpao,
-      local_extintor: data.local_especifico,
+      local_extintor: data.local_extintor || data.local_especifico,
       obs_ensaio: data.obs_ensaio,
       p_vazio_valvula: data.p_vazio_valvula,
       p_cheio_valvula: data.p_cheio_valvula,
@@ -356,6 +357,9 @@ function resetarBotaoRegistro() {
       '<i class="fa-solid fa-plus mr-2"></i> REGISTRAR EXTINTOR';
     btnReg.classList.remove("bg-emerald-500", "scale-105");
     btnReg.classList.add("bg-indigo-600");
+  }
+  if (typeof window.limparCamposAposRegistro === "function") {
+    window.limparCamposAposRegistro();
   }
 }
 

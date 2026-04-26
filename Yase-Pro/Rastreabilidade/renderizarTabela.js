@@ -171,7 +171,7 @@ function renderItens(itens) {
       }
 
       return `
-      <tr data-index="${index}" class="group text-[11px] border-b border-slate-800 hover:bg-slate-800/40 transition-colors whitespace-nowrap ${corDaLinha}">
+      <tr data-index="${index}" data-id="${item.id}" class="group text-[11px] border-b border-slate-800 hover:bg-slate-800/40 transition-colors whitespace-nowrap ${corDaLinha}">
         <td class="p-3 sticky left-0 z-[40] bg-[#0f172a] border-r border-slate-700 font-bold group-hover:bg-[#1e293b] transition-colors">
           ${index + 1}
         </td>
@@ -279,8 +279,11 @@ function configurarCliquesTabela() {
   if (!tableBody) return;
   tableBody.onclick = (e) => {
     const row = e.target.closest("tr");
-    if (row && row.dataset.index !== undefined) {
+    if (row && row.dataset.index !== undefined && !e.target.closest("button")) {
       destacarLinha(parseInt(row.dataset.index));
+      if (row.dataset.id && typeof window.prepararEdicao === "function") {
+        window.prepararEdicao(row.dataset.id);
+      }
     }
   };
 }
