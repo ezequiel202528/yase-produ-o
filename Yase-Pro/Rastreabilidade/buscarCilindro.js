@@ -28,13 +28,14 @@ async function buscarCilindro() {
       .single();
 
     if (itemLocal) {
-      // Apenas destaca na tabela e seleciona para o modal de componentes
+      // Apenas destaca na tabela e seleciona o ID para o modal de componentes
+      window.idSelecionadoComponentes = itemLocal.id;
+
       const rows = document.querySelectorAll("#itensList tr");
       rows.forEach((row) => {
         if (row.dataset.id == itemLocal.id) {
           if (typeof window.destacarLinha === "function")
             window.destacarLinha(parseInt(row.dataset.index));
-          window.idSelecionadoComponentes = itemLocal.id;
         }
       });
 
@@ -133,6 +134,8 @@ async function executarBuscaModal() {
         linhas.forEach((linha) => {
           if (linha.innerText.includes(nrCilindroBusca)) {
             linhaParaDestacar = linha;
+            // Vincula o ID encontrado para a seleção de componentes
+            window.idSelecionadoComponentes = item.id;
           }
         });
 

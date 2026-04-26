@@ -279,6 +279,7 @@ function configurarCliquesTabela() {
   if (!tableBody) return;
   tableBody.onclick = (e) => {
     const row = e.target.closest("tr");
+    // Se clicar na linha (e não nos botões de editar/excluir)
     if (
       row &&
       row.dataset.index !== undefined &&
@@ -286,7 +287,9 @@ function configurarCliquesTabela() {
       !e.target.closest("i")
     ) {
       destacarLinha(parseInt(row.dataset.index));
-      // Define o ID apenas para o Modal de Componentes, sem carregar o formulário de edição
+
+      // IMPORTANTE: Define o ID para o modal de componentes,
+      // mas NÃO chama prepararEdicao(), mantendo o formulário de cima limpo.
       window.idSelecionadoComponentes = row.dataset.id;
     }
   };

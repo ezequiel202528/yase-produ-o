@@ -55,8 +55,14 @@ async function abrirModalComponentes() {
   if (modal) {
     const idTarget = window.editandoID || window.idSelecionadoComponentes;
 
+    // Primeiro, limpa todos os checkboxes para garantir que o modal comece "limpo"
+    listaCompGlobal.forEach((item) => {
+      const el = document.getElementById(`comp_${item}`);
+      if (el) el.checked = false;
+    });
+
     if (idTarget) {
-      // Se houver um extintor selecionado, busca os componentes dele no banco
+      // Se houver um extintor selecionado (pelo clique na tabela ou busca), busca os dados dele
       try {
         const { data, error } = await window._supabase
           .from("itens_os")
@@ -73,12 +79,6 @@ async function abrirModalComponentes() {
       } catch (err) {
         console.error("Erro ao carregar componentes:", err);
       }
-    } else {
-      // Caso contrário (novo registro), abre o modal limpo
-      listaCompGlobal.forEach((item) => {
-        const el = document.getElementById(`comp_${item}`);
-        if (el) el.checked = false;
-      });
     }
 
     if (typeof window.atualizarBadgeComponentes === "function") {
