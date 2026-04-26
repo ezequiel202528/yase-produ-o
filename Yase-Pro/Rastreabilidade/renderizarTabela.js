@@ -279,11 +279,15 @@ function configurarCliquesTabela() {
   if (!tableBody) return;
   tableBody.onclick = (e) => {
     const row = e.target.closest("tr");
-    if (row && row.dataset.index !== undefined && !e.target.closest("button")) {
+    if (
+      row &&
+      row.dataset.index !== undefined &&
+      !e.target.closest("button") &&
+      !e.target.closest("i")
+    ) {
       destacarLinha(parseInt(row.dataset.index));
-      if (row.dataset.id && typeof window.prepararEdicao === "function") {
-        window.prepararEdicao(row.dataset.id);
-      }
+      // Armazena o ID apenas para operações individuais como seleção de componentes
+      window.idSelecionadoComponentes = row.dataset.id;
     }
   };
 }
@@ -618,6 +622,7 @@ function limparCamposAposRegistro() {
     badgeComp.classList.add("hidden");
   }
   window.editandoID = null;
+  window.idSelecionadoComponentes = null;
   window.fabricanteValido = false;
   if (typeof setLevel === "function") {
     setLevel(2);

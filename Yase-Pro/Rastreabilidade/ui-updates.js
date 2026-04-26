@@ -24,15 +24,103 @@ window.addEventListener("load", () => {
   iniciarSincronizacao();
 });
 
+const listaCompGlobal = [
+  "pistola",
+  "valvula",
+  "bucha",
+  "sifao",
+  "punho_pino",
+  "quebra_jato",
+  "manometro",
+  "mangueira",
+  "cord_plastico",
+  "saia_plastica",
+  "conj_apague",
+  "difusor",
+  "pera_ved",
+  "mola_rosca",
+  "conj_miolo",
+  "conj_haste",
+  "anel_oring",
+  "sifao_aluminio",
+  "conj_seguranca",
+  "haste_valvula",
+  "gancho_sup",
+  "trava_corrente",
+];
+
 // Função para abrir o modal de componentes
-function abrirModalComponentes() {
+async function abrirModalComponentes() {
   const modal = document.getElementById("modalComponentes");
   if (modal) {
+    const idTarget = window.editandoID || window.idSelecionadoComponentes;
+
+    if (idTarget) {
+      // Se houver um extintor selecionado, busca os componentes dele no banco
+      try {
+        const { data, error } = await window._supabase
+          .from("itens_os")
+          .select("*")
+          .eq("id", idTarget)
+          .single();
+
+        if (!error && data) {
+          listaCompGlobal.forEach((item) => {
+            const el = document.getElementById(`comp_${item}`);
+            if (el) el.checked = data[`comp_${item}`] || false;
+          });
+        }
+      } catch (err) {
+        console.error("Erro ao carregar componentes:", err);
+      }
+    } else {
+      // Caso contrário (novo registro), abre o modal limpo
+      listaCompGlobal.forEach((item) => {
+        const el = document.getElementById(`comp_${item}`);
+        if (el) el.checked = false;
+      });
+    }
+
+    if (typeof window.atualizarBadgeComponentes === "function") {
+      window.atualizarBadgeComponentes();
+    }
+
     // Remove 'hidden' para tornar visível e adiciona 'flex' para centralizar
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   } else {
     console.error("Erro: O modal 'modalComponentes' não foi encontrado.");
+  }
+}
+
+// Função para salvar componentes individualmente no banco através do botão do modal
+async function salvarComponentesNoModal() {
+  const idTarget = window.editandoID || window.idSelecionadoComponentes;
+
+  // Se for um novo registro (sem ID ainda), apenas fecha o modal.
+  // As seleções serão salvas quando o usuário clicar em "Registrar Extintor".
+  if (!idTarget) {
+    fecharModalComponentes();
+    return;
+  }
+
+  try {
+    const updateData = {};
+    listaCompGlobal.forEach((item) => {
+      const el = document.getElementById(`comp_${item}`);
+      updateData[`comp_${item}`] = el ? el.checked : false;
+    });
+
+    const { error } = await window._supabase
+      .from("itens_os")
+      .update(updateData)
+      .eq("id", idTarget);
+
+    if (error) throw error;
+    fecharModalComponentes();
+  } catch (err) {
+    console.error("Erro ao salvar componentes:", err);
+    alert("Erro ao salvar seleções.");
   }
 }
 
@@ -66,6 +154,7 @@ function X_ABRIR_NBR() {
 }
 
 window.abrirModalComponentes = abrirModalComponentes;
+window.salvarComponentesNoModal = salvarComponentesNoModal;
 window.fecharModalComponentes = fecharModalComponentes;
 window.X_ABRIR_TIPO = X_ABRIR_TIPO;
 window.openCapacidadeModal = openCapacidadeModal;
