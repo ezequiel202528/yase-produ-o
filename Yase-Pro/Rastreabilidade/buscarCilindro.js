@@ -28,11 +28,16 @@ async function buscarCilindro() {
       .single();
 
     if (itemLocal) {
-      if (typeof window.prepararEdicao === "function") {
-        await window.prepararEdicao(itemLocal.id);
-      } else {
-        preencherCampos(itemLocal);
-      }
+      // Apenas destaca na tabela e seleciona para o modal de componentes
+      const rows = document.querySelectorAll("#itensList tr");
+      rows.forEach((row) => {
+        if (row.dataset.id == itemLocal.id) {
+          if (typeof window.destacarLinha === "function")
+            window.destacarLinha(parseInt(row.dataset.index));
+          window.idSelecionadoComponentes = itemLocal.id;
+        }
+      });
+
       alert("Item encontrado nesta Ordem de Serviço.");
       return;
     }

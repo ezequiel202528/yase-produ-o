@@ -286,7 +286,7 @@ function configurarCliquesTabela() {
       !e.target.closest("i")
     ) {
       destacarLinha(parseInt(row.dataset.index));
-      // Armazena o ID apenas para operações individuais como seleção de componentes
+      // Define o ID apenas para o Modal de Componentes, sem carregar o formulário de edição
       window.idSelecionadoComponentes = row.dataset.id;
     }
   };
